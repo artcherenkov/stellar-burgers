@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "@ya.praktikum/react-developer-burger-ui-components";
 
-import App from "./components/app";
+import App from "./components/app/app";
 
 ReactDOM.render(
   <React.StrictMode>
