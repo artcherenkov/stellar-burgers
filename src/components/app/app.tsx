@@ -9,10 +9,10 @@ import styles from "./app.module.css";
 const App = () => {
   return (
     <>
-      <AppHeader/>
+      <AppHeader />
       <div className={styles.burgerContainer}>
-        <BurgerIngredients/>
-        <BurgerConstructor/>
+        <BurgerIngredients />
+        <BurgerConstructor />
       </div>
     </>
   );
