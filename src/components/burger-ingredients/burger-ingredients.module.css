@@ -42,3 +42,7 @@
   min-height: 48px;
   text-align: center;
 }
+
+.tabLink {
+  text-decoration: none;
+}
