@@ -1,19 +1,23 @@
-import styles from "../../../burger-ingredients/burger-ingredients.module.css";
-import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components";
-import cn from "classnames";
+import {
+  ConstructorElement,
+  DragIcon,
+} from "@ya.praktikum/react-developer-burger-ui-components";
 import { TIngredient } from "../../../burger-ingredients/burger-ingredients";
+import styles from "../../burger-constructor.module.css";
 
 const Ingredient = (props: TIngredient) => (
-  <div className={styles.burgerIngredient}>
-    <img className="pr-4 pl-4 mb-1" src={props.image} alt={props.name} />
-    <p className={styles.ingredientCost}>
-      <span className="text text_type_digits-default mr-2">{props.price}</span>{" "}
-      <CurrencyIcon type="primary" />
-    </p>
-    <h3 className={cn(styles.ingredientTitle, "text text_type_main-default")}>
-      {props.name}
-    </h3>
-  </div>
+  <>
+    <button className={styles.button}>
+      <DragIcon type="primary" />
+    </button>
+    <div className={styles.ingredientContainer}>
+      <ConstructorElement
+        text={props.name}
+        price={props.price}
+        thumbnail={props.image}
+      />
+    </div>
+  </>
 );
 
 export default Ingredient;

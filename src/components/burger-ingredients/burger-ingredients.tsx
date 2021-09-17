@@ -4,7 +4,7 @@ import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 import { MOCKS } from "../../utils/data";
 
 import styles from "./burger-ingredients.module.css";
-import Ingredient from "../burger-constructor/components/ingredient/ingredient";
+import Ingredient from "./components/ingredient/ingredient";
 
 const Type = {
   BUN: "bun",
