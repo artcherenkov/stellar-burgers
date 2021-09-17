@@ -112,8 +112,8 @@ const BurgerConstructor = () => (
       />
     </div>
     <ul className={cn(styles.list, "custom-scroll")}>
-      {CONSTRUCTOR.map((item) => (
-        <li className={styles.item} key={item._id}>
+      {CONSTRUCTOR.map((item, idx) => (
+        <li className={styles.item} key={`${item._id}-${idx}`}>
           <Ingredient {...item} />
         </li>
       ))}
