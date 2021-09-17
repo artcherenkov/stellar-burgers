@@ -1,6 +1,8 @@
 .root {
   composes: pt-10 from global;
   max-width: 600px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ingredientsContainer {

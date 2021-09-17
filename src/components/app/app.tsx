@@ -8,13 +8,13 @@ import styles from "./app.module.css";
 
 const App = () => {
   return (
-    <>
+    <div className={styles.root}>
       <AppHeader />
       <div className={styles.burgerContainer}>
         <BurgerIngredients />
         <BurgerConstructor />
       </div>
-    </>
+    </div>
   );
 };
 
