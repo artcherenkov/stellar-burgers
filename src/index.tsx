@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import "@ya.praktikum/react-developer-burger-ui-components";
+
+import App from "./components/app/app";
 
 ReactDOM.render(
   <React.StrictMode>
