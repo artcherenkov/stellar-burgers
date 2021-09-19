@@ -28,6 +28,9 @@
 
 .image {
   align-self: center;
+  width: 480px;
+  height: 240px;
+  display: block;
 }
 
 .title {

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
+import { Type } from "../app/app";
 
 export type TIngredient = {
   _id: string;
@@ -20,43 +21,20 @@ export type TIngredient = {
   __v: number;
 };
 
-const Type = {
-  BUN: "bun",
-  SAUCE: "sauce",
-  MAIN: "main",
-};
-const API_URL = "https://norma.nomoreparties.space/api/ingredients";
+interface IBurgerIngredients {
+  ingredients: { [key: string]: TIngredient[] };
+  onIngredientClick: (id: string) => void;
+}
 
-const sortIngredientsByType = (data: TIngredient[]) => {
-  const buns = data.filter((i) => i.type === Type.BUN);
-  const mains = data.filter((i) => i.type === Type.MAIN);
-  const sauces = data.filter((i) => i.type === Type.SAUCE);
-  return { buns, mains, sauces };
-};
-
-const BurgerIngredients = () => {
+const BurgerIngredients = (props: IBurgerIngredients) => {
   const [current, setCurrent] = useState(Type.BUN);
-  const [data, setData] =
-    useState<null | { [key: string]: TIngredient[] }>(null);
-
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then(({ data }) => setData(sortIngredientsByType(data)))
-      .catch((err) => console.log(err));
-  }, []);
+  const { buns, mains, sauces } = props.ingredients;
 
   const onTabClick = (value: string) => setCurrent(value);
 
-  if (!data) {
-    return <p>Загрузка...</p>;
-  }
-
-  const { buns, mains, sauces } = data;
-
   const renderIngredient = (item: TIngredient) => (
     <li className={styles.ingredientsItem} key={item._id}>
-      <Ingredient {...item} />
+      <Ingredient {...item} onClick={() => props.onIngredientClick(item._id)} />
     </li>
   );
 

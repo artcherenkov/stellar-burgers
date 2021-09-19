@@ -1,24 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import AppHeader from "../app-header/app-header";
-import BurgerIngredients from "../burger-ingredients/burger-ingredients";
+import BurgerIngredients, {
+  TIngredient,
+} from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
-
-import styles from "./app.module.css";
 import Modal from "../modal/modal";
+import IngredientDetails from "../ingredient-details/ingredient-details";
+import styles from "./app.module.css";
+
+const API_URL = "https://norma.nomoreparties.space/api/ingredients";
+export const Type = {
+  BUN: "bun",
+  SAUCE: "sauce",
+  MAIN: "main",
+};
+
+const getIngredientById = (arr: TIngredient[], id: string | null) =>
+  id && arr.find((i) => i._id === id);
+
+const sortIngredientsByType = (data: TIngredient[]) => {
+  const buns = data.filter((i) => i.type === Type.BUN);
+  const mains = data.filter((i) => i.type === Type.MAIN);
+  const sauces = data.filter((i) => i.type === Type.SAUCE);
+  return { buns, mains, sauces };
+};
+
+// временное решение для нахождения данных для конструктора
+const getBun = (data: TIngredient[]) => data.find((d) => d.type === Type.BUN);
+const getMainsAndSauces = (data: TIngredient[]) =>
+  data.filter((d) => d.type !== Type.BUN);
 
 const App = () => {
+  const [data, setData] = useState<null | TIngredient[]>(null);
+  const [sortedIngredients, setSortedIngredients] =
+    useState<null | { [key: string]: TIngredient[] }>(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then(({ data }) => {
+        setData(data);
+        setSortedIngredients(sortIngredientsByType(data));
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   const [open, setOpen] = useState(false);
-  const onModalClose = () => setOpen(false);
+  const [activeIngredientId, setActiveIngredientId] =
+    useState<null | string>(null);
+
+  const onModalClose = () => {
+    setOpen(false);
+    setTimeout(() => setActiveIngredientId(null), 300);
+  };
+
+  if (!data || !sortedIngredients) {
+    return <p>Loading...</p>;
+  }
+
+  const onIngredientClick = (ingredientId: string) => {
+    setOpen(true);
+    setActiveIngredientId(ingredientId);
+  };
+
+  const activeIngredient = getIngredientById(data, activeIngredientId);
+
+  // временное решение для заполнения конструктора
+  const bun = getBun(data)!;
+  const mainsAndSauces = getMainsAndSauces(data);
 
   return (
     <div className={styles.root}>
       <AppHeader />
       <div className={styles.burgerContainer}>
-        <BurgerIngredients />
-        <BurgerConstructor />
+        <BurgerIngredients
+          ingredients={sortedIngredients}
+          onIngredientClick={onIngredientClick}
+        />
+        <BurgerConstructor
+          bun={bun}
+          main={mainsAndSauces}
+          onIngredientClick={onIngredientClick}
+        />
+        <Modal open={open} onClose={onModalClose}>
+          {activeIngredient && (
+            <IngredientDetails ingredient={activeIngredient} />
+          )}
+        </Modal>
       </div>
-      <Modal open={open} onClose={onModalClose} />
     </div>
   );
 };
