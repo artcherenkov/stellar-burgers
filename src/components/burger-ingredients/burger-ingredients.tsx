@@ -1,16 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
-import { MOCKS } from "../../utils/data";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-
-const Type = {
-  BUN: "bun",
-  SAUCE: "sauce",
-  MAIN: "main",
-};
 
 export type TIngredient = {
   _id: string;
@@ -27,6 +20,13 @@ export type TIngredient = {
   __v: number;
 };
 
+const Type = {
+  BUN: "bun",
+  SAUCE: "sauce",
+  MAIN: "main",
+};
+const API_URL = "https://norma.nomoreparties.space/api/ingredients";
+
 const sortIngredientsByType = (data: TIngredient[]) => {
   const buns = data.filter((i) => i.type === Type.BUN);
   const mains = data.filter((i) => i.type === Type.MAIN);
@@ -36,9 +36,23 @@ const sortIngredientsByType = (data: TIngredient[]) => {
 
 const BurgerIngredients = () => {
   const [current, setCurrent] = useState(Type.BUN);
+  const [data, setData] =
+    useState<null | { [key: string]: TIngredient[] }>(null);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then(({ data }) => setData(sortIngredientsByType(data)))
+      .catch((err) => console.log(err));
+  }, []);
+
   const onTabClick = (value: string) => setCurrent(value);
 
-  const { buns, mains, sauces } = sortIngredientsByType(MOCKS);
+  if (!data) {
+    return <p>Загрузка...</p>;
+  }
+
+  const { buns, mains, sauces } = data;
 
   const renderIngredient = (item: TIngredient) => (
     <li className={styles.ingredientsItem} key={item._id}>
