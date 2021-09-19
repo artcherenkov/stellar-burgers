@@ -12,6 +12,7 @@ interface IBurgerConstructor {
   bun: TIngredient;
   main: TIngredient[];
   onIngredientClick: (id: string) => void;
+  openPopup: () => void;
 }
 
 const countPrice = (bun: TIngredient, main: TIngredient[]) => {
@@ -73,7 +74,7 @@ const BurgerConstructor = (props: IBurgerConstructor) => (
         </span>
         <CurrencyIcon type="primary" />
       </p>
-      <Button type="primary" size="large">
+      <Button type="primary" size="large" onClick={props.openPopup}>
         Оформить заказ
       </Button>
     </div>
