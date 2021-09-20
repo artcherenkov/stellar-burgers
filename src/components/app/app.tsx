@@ -9,6 +9,7 @@ import Modal from "../modal/modal";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import styles from "./app.module.css";
 import OrderDetails from "../order-details/order-details";
+import { getResponseData } from "../../utils/api";
 
 const API_URL = "https://norma.nomoreparties.space/api/ingredients";
 export const Type = {
@@ -39,7 +40,7 @@ const App = () => {
 
   useEffect(() => {
     fetch(API_URL)
-      .then((res) => res.json())
+      .then(getResponseData)
       .then(({ data }) => {
         setData(data);
         setSortedIngredients(sortIngredientsByType(data));
