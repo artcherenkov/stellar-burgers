@@ -1,5 +1,25 @@
 .root {
   width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 300ms, visibility 300ms;
+}
+
+.root_open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.content {
   max-width: 720px;
   border-radius: 40px;
   padding: 40px 40px 60px;

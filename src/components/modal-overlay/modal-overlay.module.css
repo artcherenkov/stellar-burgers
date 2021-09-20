@@ -1,20 +1,8 @@
 .root {
   background: rgba(0, 0, 0, 0.6);
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 300ms, visibility 300ms;
-}
-
-.root_open {
-  visibility: visible;
-  opacity: 1;
 }
