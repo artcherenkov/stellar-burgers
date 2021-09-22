@@ -1,16 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
-import { MOCKS } from "../../utils/data";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-
-const Type = {
-  BUN: "bun",
-  SAUCE: "sauce",
-  MAIN: "main",
-};
+import { Type } from "../app/app";
 
 export type TIngredient = {
   _id: string;
@@ -27,22 +21,20 @@ export type TIngredient = {
   __v: number;
 };
 
-const sortIngredientsByType = (data: TIngredient[]) => {
-  const buns = data.filter((i) => i.type === Type.BUN);
-  const mains = data.filter((i) => i.type === Type.MAIN);
-  const sauces = data.filter((i) => i.type === Type.SAUCE);
-  return { buns, mains, sauces };
-};
+interface IBurgerIngredients {
+  ingredients: { [key: string]: TIngredient[] };
+  onIngredientClick: (id: string) => void;
+}
 
-const BurgerIngredients = () => {
+const BurgerIngredients = (props: IBurgerIngredients) => {
   const [current, setCurrent] = useState(Type.BUN);
-  const onTabClick = (value: string) => setCurrent(value);
+  const { buns, mains, sauces } = props.ingredients;
 
-  const { buns, mains, sauces } = sortIngredientsByType(MOCKS);
+  const onTabClick = (value: string) => setCurrent(value);
 
   const renderIngredient = (item: TIngredient) => (
     <li className={styles.ingredientsItem} key={item._id}>
-      <Ingredient {...item} />
+      <Ingredient {...item} onClick={() => props.onIngredientClick(item._id)} />
     </li>
   );
 

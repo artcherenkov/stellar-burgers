@@ -5,12 +5,16 @@ import {
 import { TIngredient } from "../../../burger-ingredients/burger-ingredients";
 import styles from "../../burger-constructor.module.css";
 
-const Ingredient = (props: TIngredient) => (
+interface IIngredient extends TIngredient {
+  onClick: () => void;
+}
+
+const Ingredient = (props: IIngredient) => (
   <>
     <button className={styles.button}>
       <DragIcon type="primary" />
     </button>
-    <div className={styles.ingredientContainer}>
+    <div className={styles.ingredientContainer} onClick={props.onClick}>
       <ConstructorElement
         text={props.name}
         price={props.price}
