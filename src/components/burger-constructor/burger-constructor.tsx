@@ -8,12 +8,14 @@ import styles from "./burger-constructor.module.css";
 import Ingredient from "./components/ingredient/ingredient";
 import { TIngredient } from "../burger-ingredients/burger-ingredients";
 import { Type } from "../app/app";
-import { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import IngredientsContext from "../../context/IngredientsContext";
+import { postOrder } from "../../utils/api";
+import Modal from "../modal/modal";
+import OrderDetails from "../order-details/order-details";
 
 interface IBurgerConstructor {
   onIngredientClick: (id: string) => void;
-  openPopup: () => void;
 }
 
 const MOCK_SAUCES_COUNT = 2;
@@ -31,12 +33,35 @@ export const getMockIngredientsSet = (ingredients: TIngredient[]) => {
   return { bun, mains: [sauces[0], ...mains, sauces[1]] };
 };
 
+const DEFAULT_ORDER_DETAILS = {
+  name: "",
+  order: {
+    number: -1,
+  },
+  success: false,
+};
+
+const ANIMATION_DURATION = 300; // мс
+
 const BurgerConstructor = (props: IBurgerConstructor) => {
   const initialIngredients = useContext(IngredientsContext);
   const mockIngredientsSet = getMockIngredientsSet(initialIngredients);
 
   const { bun, mains } = mockIngredientsSet;
   const [ingredients, setIngredients] = useState([...mains]);
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(DEFAULT_ORDER_DETAILS);
+  const onClosePopup = () => {
+    setIsPopupOpen(false);
+    // очистить поля после плавного закрытия попапа
+    setTimeout(
+      () => setOrderDetails(DEFAULT_ORDER_DETAILS),
+      ANIMATION_DURATION
+    );
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const totalPrice = useMemo(() => {
     return ingredients
@@ -46,6 +71,21 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
         return acc;
       }, bun.price);
   }, [bun, ingredients]);
+
+  const getIngredientsIds = (ingredients: TIngredient[]) =>
+    ingredients.map((i) => i._id);
+
+  const onOrderSubmit = () => {
+    const ingredientsIds = getIngredientsIds([bun, ...ingredients]);
+    setIsLoading(true);
+    postOrder({ ingredients: ingredientsIds })
+      .then((data) => {
+        setOrderDetails(data);
+        setIsPopupOpen(true);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
 
   return (
     <section className={cn(styles.root, "ml-10")}>
@@ -97,10 +137,14 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
           </span>
           <CurrencyIcon type="primary" />
         </p>
-        <Button type="primary" size="large" onClick={props.openPopup}>
-          Оформить заказ
+        <Button type="primary" size="large" onClick={onOrderSubmit}>
+          {isLoading ? "Загрузка..." : "Оформить заказ"}
         </Button>
       </div>
+
+      <Modal open={isPopupOpen} onClose={onClosePopup}>
+        <OrderDetails {...orderDetails} />
+      </Modal>
     </section>
   );
 };

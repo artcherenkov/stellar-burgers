@@ -8,11 +8,9 @@ import BurgerConstructor from "../burger-constructor/burger-constructor";
 import Modal from "../modal/modal";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import styles from "./app.module.css";
-import OrderDetails from "../order-details/order-details";
-import { getResponseData } from "../../utils/api";
+import { getIngredients } from "../../utils/api";
 import IngredientsContext from "../../context/IngredientsContext";
 
-const API_URL = "https://norma.nomoreparties.space/api/ingredients";
 export const Type = {
   BUN: "bun",
   SAUCE: "sauce",
@@ -26,8 +24,7 @@ const App = () => {
   const [data, setData] = useState<TIngredient[]>([]);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then(getResponseData)
+    getIngredients()
       .then(({ data }) => setData(data))
       .catch((err) => console.log(err));
   }, []);
@@ -36,10 +33,6 @@ const App = () => {
   const [activeIngredientId, setActiveIngredientId] = useState<null | string>(
     null
   );
-
-  const [orderPopupOpen, setOrderPopupOpen] = useState(false);
-  const handleOrderPopupClose = () => setOrderPopupOpen(false);
-  const handleOrderPopupOpen = () => setOrderPopupOpen(true);
 
   const onModalClose = () => {
     setDetailsPopupOpen(false);
@@ -63,17 +56,11 @@ const App = () => {
         <AppHeader />
         <div className={styles.burgerContainer}>
           <BurgerIngredients onIngredientClick={onIngredientClick} />
-          <BurgerConstructor
-            onIngredientClick={onIngredientClick}
-            openPopup={handleOrderPopupOpen}
-          />
+          <BurgerConstructor onIngredientClick={onIngredientClick} />
           <Modal open={detailsPopupOpen} onClose={onModalClose}>
             {activeIngredient && (
               <IngredientDetails ingredient={activeIngredient} />
             )}
-          </Modal>
-          <Modal open={orderPopupOpen} onClose={handleOrderPopupClose}>
-            <OrderDetails />
           </Modal>
         </div>
       </div>
