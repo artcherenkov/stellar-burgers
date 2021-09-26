@@ -35,7 +35,12 @@
 }
 
 .ingredientContainer_outter {
-  padding-right: 22px;
+  width: 100%;
+}
+
+/* костыль, чтобы достать до ингредиента из пакета Яндекса */
+.ingredientContainer_outter > div {
+  max-width: initial;
 }
 
 .button {

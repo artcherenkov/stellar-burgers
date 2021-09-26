@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
 import { Type } from "../app/app";
+import IngredientsContext from "../../context/IngredientsContext";
 
 export type TIngredient = {
   _id: string;
@@ -22,13 +23,21 @@ export type TIngredient = {
 };
 
 interface IBurgerIngredients {
-  ingredients: { [key: string]: TIngredient[] };
   onIngredientClick: (id: string) => void;
 }
 
+const sortIngredientsByType = (data: TIngredient[]) => {
+  const buns = data.filter((i) => i.type === Type.BUN);
+  const mains = data.filter((i) => i.type === Type.MAIN);
+  const sauces = data.filter((i) => i.type === Type.SAUCE);
+  return { buns, mains, sauces };
+};
+
 const BurgerIngredients = (props: IBurgerIngredients) => {
+  const ingredients = useContext(IngredientsContext);
+
   const [current, setCurrent] = useState(Type.BUN);
-  const { buns, mains, sauces } = props.ingredients;
+  const { buns, mains, sauces } = sortIngredientsByType(ingredients);
 
   const onTabClick = (value: string) => setCurrent(value);
 

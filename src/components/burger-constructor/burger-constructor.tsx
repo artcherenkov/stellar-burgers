@@ -7,78 +7,102 @@ import {
 import styles from "./burger-constructor.module.css";
 import Ingredient from "./components/ingredient/ingredient";
 import { TIngredient } from "../burger-ingredients/burger-ingredients";
+import { Type } from "../app/app";
+import { useContext, useMemo, useState } from "react";
+import IngredientsContext from "../../context/IngredientsContext";
 
 interface IBurgerConstructor {
-  bun: TIngredient;
-  main: TIngredient[];
   onIngredientClick: (id: string) => void;
   openPopup: () => void;
 }
 
-const countPrice = (bun: TIngredient, main: TIngredient[]) => {
-  return main
-    .map((ing) => ing.price)
-    .reduce((ing, acc) => {
-      acc = acc + ing;
-      return acc;
-    }, bun.price);
+const MOCK_SAUCES_COUNT = 2;
+const MOCK_MAINS_COUNT = 2;
+
+export const getMockIngredientsSet = (ingredients: TIngredient[]) => {
+  const bun = ingredients.find((i) => i.type === Type.BUN)!;
+  const sauces = ingredients
+    .filter((i) => i.type === Type.SAUCE)
+    .slice(0, MOCK_SAUCES_COUNT);
+  const mains = ingredients
+    .filter((i) => i.type === Type.MAIN)
+    .slice(0, MOCK_MAINS_COUNT);
+
+  return { bun, mains: [sauces[0], ...mains, sauces[1]] };
 };
 
-const BurgerConstructor = (props: IBurgerConstructor) => (
-  <section className={cn(styles.root, "ml-10")}>
-    <div
-      className={cn(
-        styles.ingredientContainer,
-        styles.ingredientContainer_outter
-      )}
-      onClick={() => props.onIngredientClick(props.bun._id)}
-    >
-      <ConstructorElement
-        type="top"
-        isLocked={true}
-        text={`${props.bun.name} (верх)`}
-        price={props.bun.price}
-        thumbnail={props.bun.image}
-      />
-    </div>
-    <ul className={cn(styles.list, "custom-scroll")}>
-      {props.main.map((item, idx) => (
-        <li className={styles.item} key={`${item._id}-${idx}`}>
-          <Ingredient
-            {...item}
-            onClick={() => props.onIngredientClick(item._id)}
-          />
-        </li>
-      ))}
-    </ul>
-    <div
-      className={cn(
-        styles.ingredientContainer,
-        styles.ingredientContainer_outter
-      )}
-      onClick={() => props.onIngredientClick(props.bun._id)}
-    >
-      <ConstructorElement
-        type="bottom"
-        isLocked={true}
-        text={`${props.bun.name} (низ)`}
-        price={props.bun.price}
-        thumbnail={props.bun.image}
-      />
-    </div>
+const BurgerConstructor = (props: IBurgerConstructor) => {
+  const initialIngredients = useContext(IngredientsContext);
+  const mockIngredientsSet = getMockIngredientsSet(initialIngredients);
 
-    <div className={cn(styles.results, "mt-10")}>
-      <p className={cn(styles.totalCost, "mr-10")}>
-        <span className="text text_type_digits-medium mr-2">
-          {countPrice(props.bun, props.main)}
-        </span>
-        <CurrencyIcon type="primary" />
-      </p>
-      <Button type="primary" size="large" onClick={props.openPopup}>
-        Оформить заказ
-      </Button>
-    </div>
-  </section>
-);
+  const { bun, mains } = mockIngredientsSet;
+  const [ingredients, setIngredients] = useState([...mains]);
+
+  const totalPrice = useMemo(() => {
+    return ingredients
+      .map((ing) => ing.price)
+      .reduce((ing, acc) => {
+        acc = acc + ing;
+        return acc;
+      }, bun.price);
+  }, [bun, ingredients]);
+
+  return (
+    <section className={cn(styles.root, "ml-10")}>
+      <div
+        className={cn(
+          styles.ingredientContainer,
+          styles.ingredientContainer_outter
+        )}
+        onClick={() => props.onIngredientClick(bun._id)}
+      >
+        <ConstructorElement
+          type="top"
+          isLocked={true}
+          text={`${bun.name} (верх)`}
+          price={bun.price}
+          thumbnail={bun.image}
+        />
+      </div>
+      <ul className={cn(styles.list, "custom-scroll")}>
+        {ingredients.map((item, idx) => (
+          <li className={styles.item} key={`${item._id}-${idx}`}>
+            <Ingredient
+              {...item}
+              onClick={() => props.onIngredientClick(item._id)}
+            />
+          </li>
+        ))}
+      </ul>
+      <div
+        className={cn(
+          styles.ingredientContainer,
+          styles.ingredientContainer_outter
+        )}
+        onClick={() => props.onIngredientClick(bun._id)}
+      >
+        <ConstructorElement
+          type="bottom"
+          isLocked={true}
+          text={`${bun.name} (низ)`}
+          price={bun.price}
+          thumbnail={bun.image}
+        />
+      </div>
+
+      <div className={cn(styles.results, "mt-10")}>
+        <p className={cn(styles.totalCost, "mr-10")}>
+          <span className="text text_type_digits-medium mr-2">
+            {totalPrice}
+          </span>
+          <CurrencyIcon type="primary" />
+        </p>
+        <Button type="primary" size="large" onClick={props.openPopup}>
+          Оформить заказ
+        </Button>
+      </div>
+    </section>
+  );
+};
 
 export default BurgerConstructor;
