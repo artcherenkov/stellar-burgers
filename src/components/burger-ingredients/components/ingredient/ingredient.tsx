@@ -1,7 +1,7 @@
 import styles from "../../burger-ingredients.module.css";
 import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components";
 import cn from "classnames";
-import { TIngredient } from "../../burger-ingredients";
+import { TIngredient } from "../../../app/app.typed";
 
 interface IIngredient extends TIngredient {
   onClick: () => void;

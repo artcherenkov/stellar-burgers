@@ -1,7 +1,7 @@
 import cn from "classnames";
 import styles from "../modal/modal.module.css";
 import NutritionFacts from "./components/nutrition-facts/nutrition-facts";
-import { TIngredient } from "../burger-ingredients/burger-ingredients";
+import { TIngredient } from "../app/app.typed";
 
 interface IIngredientDetails {
   ingredient: TIngredient;

@@ -1,105 +1,177 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 
 import AppHeader from "../app-header/app-header";
-import BurgerIngredients, {
-  TIngredient,
-} from "../burger-ingredients/burger-ingredients";
+import BurgerIngredients from "../burger-ingredients/burger-ingredients";
 import BurgerConstructor from "../burger-constructor/burger-constructor";
 import Modal from "../modal/modal";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import styles from "./app.module.css";
-import OrderDetails from "../order-details/order-details";
-import { getResponseData } from "../../utils/api";
+import { getIngredients } from "../../utils/api";
+import IngredientsContext from "../../context/IngredientsContext";
+import {
+  ActionType,
+  IAction,
+  IConstructorState,
+  IngredientType,
+  TIngredient,
+  TIngredientWithCount,
+} from "./app.typed";
 
-const API_URL = "https://norma.nomoreparties.space/api/ingredients";
-export const Type = {
-  BUN: "bun",
-  SAUCE: "sauce",
-  MAIN: "main",
+const ErrorMessage = {
+  BUN_REQUIRED: "В качестве булки нельзя добавлять другие ингредиенты.",
+  BUN_FORBIDDEN: "Булку нельзя добавить в качестве главного ингредиента.",
+  UNDEFINED_INGREDIENT: "Ингредиента с указанным id не существует",
 };
 
-const getIngredientById = (arr: TIngredient[], id: string | null) =>
-  id && arr.find((i) => i._id === id);
+const getIngredientById = (arr: TIngredient[], id: string) => {
+  const result = arr.find((i) => i._id === id);
 
-const sortIngredientsByType = (data: TIngredient[]) => {
-  const buns = data.filter((i) => i.type === Type.BUN);
-  const mains = data.filter((i) => i.type === Type.MAIN);
-  const sauces = data.filter((i) => i.type === Type.SAUCE);
-  return { buns, mains, sauces };
+  if (!result) {
+    throw new Error(ErrorMessage.UNDEFINED_INGREDIENT);
+  }
+
+  return result;
 };
 
-// временное решение для нахождения данных для конструктора
-const getBun = (data: TIngredient[]) => data.find((d) => d.type === Type.BUN);
-const getMainsAndSauces = (data: TIngredient[]) =>
-  data.filter((d) => d.type !== Type.BUN);
+const countPrice = (ingredients: TIngredientWithCount[]) =>
+  ingredients.reduce((acc, item) => acc + item.price * item.count, 0);
+
+const initialState: IConstructorState = { bun: null, mains: [], price: 0 };
+
+const reducer = (state: IConstructorState, action: IAction) => {
+  switch (action.type) {
+    case ActionType.ADD_BUN: {
+      const newBun: TIngredientWithCount = { ...action.payload, count: 2 };
+
+      if (newBun.type !== IngredientType.BUN) {
+        throw new Error(ErrorMessage.BUN_REQUIRED);
+      }
+
+      const newPrice = countPrice([...state.mains, newBun]);
+
+      return {
+        ...state,
+        bun: newBun,
+        price: newPrice,
+      };
+    }
+    case ActionType.ADD_INGREDIENT: {
+      const newIngredient: TIngredient = action.payload;
+
+      if (newIngredient.type === IngredientType.BUN) {
+        throw new Error(ErrorMessage.BUN_FORBIDDEN);
+      }
+
+      let mains = [...state.mains];
+      const existingIngredientIndex = state.mains.findIndex(
+        (i) => i._id === newIngredient._id
+      );
+      if (existingIngredientIndex !== -1) {
+        const existingIngredient = mains[existingIngredientIndex];
+        const count = existingIngredient.count + 1;
+        mains[existingIngredientIndex] = { ...existingIngredient, count };
+      } else {
+        mains = [...state.mains, { ...newIngredient, count: 1 }];
+      }
+
+      const price = state.bun
+        ? countPrice([state.bun, ...mains])
+        : countPrice(mains);
+
+      return { ...state, mains, price };
+    }
+    case ActionType.DELETE_INGREDIENT: {
+      const ingredientId: string = action.payload;
+      const mains = state.mains.filter((i) => i._id !== ingredientId);
+      const price = state.bun
+        ? countPrice([state.bun, ...mains])
+        : countPrice(mains);
+      return { ...state, mains, price };
+    }
+    default:
+      throw new Error();
+  }
+};
 
 const App = () => {
-  const [data, setData] = useState<null | TIngredient[]>(null);
-  const [sortedIngredients, setSortedIngredients] =
-    useState<null | { [key: string]: TIngredient[] }>(null);
+  const [data, setData] = useState<TIngredient[]>([]);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then(getResponseData)
-      .then(({ data }) => {
-        setData(data);
-        setSortedIngredients(sortIngredientsByType(data));
-      })
+    getIngredients()
+      .then(({ data }) => setData(data))
       .catch((err) => console.log(err));
   }, []);
 
   const [detailsPopupOpen, setDetailsPopupOpen] = useState(false);
-  const [activeIngredientId, setActiveIngredientId] =
-    useState<null | string>(null);
+  const [activeIngredientId, setActiveIngredientId] = useState("");
 
-  const [orderPopupOpen, setOrderPopupOpen] = useState(false);
-  const handleOrderPopupClose = () => setOrderPopupOpen(false);
-  const handleOrderPopupOpen = () => setOrderPopupOpen(true);
+  const [constructorState, constructorDispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   const onModalClose = () => {
     setDetailsPopupOpen(false);
-    setTimeout(() => setActiveIngredientId(null), 300);
+    setTimeout(() => setActiveIngredientId(""), 300);
   };
 
-  if (!data || !sortedIngredients) {
-    return <p>Loading...</p>;
-  }
-
   const onIngredientClick = (ingredientId: string) => {
+    const ingredient = getIngredientById(data, ingredientId);
+    if (ingredient.type === IngredientType.BUN) {
+      constructorDispatch({ type: ActionType.ADD_BUN, payload: ingredient });
+    } else {
+      constructorDispatch({
+        type: ActionType.ADD_INGREDIENT,
+        payload: ingredient,
+      });
+    }
+
     setDetailsPopupOpen(true);
     setActiveIngredientId(ingredientId);
   };
 
-  const activeIngredient = getIngredientById(data, activeIngredientId);
+  const onConstructorIngredientClick = (ingredientId: string) => {
+    setDetailsPopupOpen(true);
+    setActiveIngredientId(ingredientId);
+  };
 
-  // временное решение для заполнения конструктора
-  const bun = getBun(data)!;
-  const mainsAndSauces = getMainsAndSauces(data);
+  const onDeleteIngredientClick = (ingredientId: string) => {
+    constructorDispatch({
+      type: ActionType.DELETE_INGREDIENT,
+      payload: ingredientId,
+    });
+  };
+
+  const activeIngredient = useMemo(() => {
+    if (activeIngredientId) {
+      return getIngredientById(data, activeIngredientId);
+    }
+    return null;
+  }, [activeIngredientId]);
+
+  if (!data.length) {
+    return <p>Loading...</p>;
+  }
 
   return (
-    <div className={styles.root}>
-      <AppHeader />
-      <div className={styles.burgerContainer}>
-        <BurgerIngredients
-          ingredients={sortedIngredients}
-          onIngredientClick={onIngredientClick}
-        />
-        <BurgerConstructor
-          bun={bun}
-          main={mainsAndSauces}
-          onIngredientClick={onIngredientClick}
-          openPopup={handleOrderPopupOpen}
-        />
-        <Modal open={detailsPopupOpen} onClose={onModalClose}>
-          {activeIngredient && (
-            <IngredientDetails ingredient={activeIngredient} />
-          )}
-        </Modal>
-        <Modal open={orderPopupOpen} onClose={handleOrderPopupClose}>
-          <OrderDetails />
-        </Modal>
+    <IngredientsContext.Provider value={data}>
+      <div className={styles.root}>
+        <AppHeader />
+        <div className={styles.burgerContainer}>
+          <BurgerIngredients onIngredientClick={onIngredientClick} />
+          <BurgerConstructor
+            constructorState={constructorState}
+            onIngredientClick={onConstructorIngredientClick}
+            onDeleteClick={onDeleteIngredientClick}
+          />
+          <Modal open={detailsPopupOpen} onClose={onModalClose}>
+            {activeIngredient && (
+              <IngredientDetails ingredient={activeIngredient} />
+            )}
+          </Modal>
+        </div>
       </div>
-    </div>
+    </IngredientsContext.Provider>
   );
 };
 

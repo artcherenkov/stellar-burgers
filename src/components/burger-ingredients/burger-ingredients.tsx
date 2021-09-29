@@ -1,34 +1,28 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-import { Type } from "../app/app";
-
-export type TIngredient = {
-  _id: string;
-  name: string;
-  type: string;
-  proteins: number;
-  fat: number;
-  carbohydrates: number;
-  calories: number;
-  price: number;
-  image: string;
-  image_mobile: string;
-  image_large: string;
-  __v: number;
-};
+import IngredientsContext from "../../context/IngredientsContext";
+import { IngredientType, TIngredient } from "../app/app.typed";
 
 interface IBurgerIngredients {
-  ingredients: { [key: string]: TIngredient[] };
   onIngredientClick: (id: string) => void;
 }
 
+const sortIngredientsByType = (data: TIngredient[]) => {
+  const buns = data.filter((i) => i.type === IngredientType.BUN);
+  const mains = data.filter((i) => i.type === IngredientType.MAIN);
+  const sauces = data.filter((i) => i.type === IngredientType.SAUCE);
+  return { buns, mains, sauces };
+};
+
 const BurgerIngredients = (props: IBurgerIngredients) => {
-  const [current, setCurrent] = useState(Type.BUN);
-  const { buns, mains, sauces } = props.ingredients;
+  const ingredients = useContext(IngredientsContext);
+
+  const [current, setCurrent] = useState(IngredientType.BUN);
+  const { buns, mains, sauces } = sortIngredientsByType(ingredients);
 
   const onTabClick = (value: string) => setCurrent(value);
 
@@ -44,29 +38,29 @@ const BurgerIngredients = (props: IBurgerIngredients) => {
         Соберите бургер
       </h1>
       <div className="mb-10" style={{ display: "flex" }}>
-        <a className={styles.tabLink} href={`#${Type.BUN}`}>
+        <a className={styles.tabLink} href={`#${IngredientType.BUN}`}>
           <Tab
-            value={Type.BUN}
-            active={current === Type.BUN}
+            value={IngredientType.BUN}
+            active={current === IngredientType.BUN}
             onClick={onTabClick}
           >
             Булки
           </Tab>
         </a>
-        <a className={styles.tabLink} href={`#${Type.SAUCE}`}>
+        <a className={styles.tabLink} href={`#${IngredientType.SAUCE}`}>
           <Tab
-            value={Type.SAUCE}
-            active={current === Type.SAUCE}
+            value={IngredientType.SAUCE}
+            active={current === IngredientType.SAUCE}
             onClick={onTabClick}
           >
             Соусы
           </Tab>
         </a>
 
-        <a className={styles.tabLink} href={`#${Type.MAIN}`}>
+        <a className={styles.tabLink} href={`#${IngredientType.MAIN}`}>
           <Tab
-            value={Type.MAIN}
-            active={current === Type.MAIN}
+            value={IngredientType.MAIN}
+            active={current === IngredientType.MAIN}
             onClick={onTabClick}
           >
             Начинки
@@ -74,18 +68,21 @@ const BurgerIngredients = (props: IBurgerIngredients) => {
         </a>
       </div>
       <div className={cn(styles.ingredientsContainer, "custom-scroll")}>
-        <h2 id={Type.BUN} className="text text_type_main-medium mb-6">
+        <h2 id={IngredientType.BUN} className="text text_type_main-medium mb-6">
           Булки
         </h2>
         <ul className={styles.ingredientsList}>{buns.map(renderIngredient)}</ul>
-        <h2 id={Type.SAUCE} className="text text_type_main-medium mb-6">
+        <h2
+          id={IngredientType.SAUCE}
+          className="text text_type_main-medium mb-6"
+        >
           Соусы
         </h2>
         <ul className={styles.ingredientsList}>
           {sauces.map(renderIngredient)}
         </ul>
         <h2 className="text text_type_main-medium mb-6">Начинки</h2>
-        <ul id={Type.MAIN} className={styles.ingredientsList}>
+        <ul id={IngredientType.MAIN} className={styles.ingredientsList}>
           {mains.map(renderIngredient)}
         </ul>
       </div>
