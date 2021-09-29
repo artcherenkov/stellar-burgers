@@ -1,5 +1,5 @@
 import React from "react";
-import { TIngredient } from "../components/burger-ingredients/burger-ingredients";
+import { TIngredient } from "../components/app/app.typed";
 
 const IngredientsContext = React.createContext<TIngredient[]>([]);
 
