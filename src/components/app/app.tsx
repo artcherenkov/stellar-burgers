@@ -16,6 +16,8 @@ import {
   TIngredient,
   TIngredientWithCount,
 } from "./app.typed";
+import { useAppDispatch } from "../../services/hooks";
+import { fetchIngredients } from "../../services/ingredientsSlice";
 
 const ErrorMessage = {
   BUN_REQUIRED: "В качестве булки нельзя добавлять другие ингредиенты.",
@@ -95,12 +97,14 @@ const reducer = (state: IConstructorState, action: IAction) => {
 
 const App = () => {
   const [data, setData] = useState<TIngredient[]>([]);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
+    dispatch(fetchIngredients());
     getIngredients()
       .then(({ data }) => setData(data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [dispatch]);
 
   const [detailsPopupOpen, setDetailsPopupOpen] = useState(false);
   const [activeIngredientId, setActiveIngredientId] = useState("");
@@ -147,7 +151,7 @@ const App = () => {
       return getIngredientById(data, activeIngredientId);
     }
     return null;
-  }, [activeIngredientId]);
+  }, [data, activeIngredientId]);
 
   if (!data.length) {
     return <p>Loading...</p>;
