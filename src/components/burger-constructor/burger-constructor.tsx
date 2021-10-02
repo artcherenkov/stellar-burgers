@@ -46,10 +46,8 @@ const BurgerConstructor = () => {
     <section className={cn(styles.root, "ml-10")}>
       {bun && <Ingredient bun position="top" {...bun} />}
       <ul className={cn(styles.list, "custom-scroll")}>
-        {mains.map((item, idx) => (
-          <li className={styles.item} key={`${item._id}-${idx}`}>
-            <Ingredient {...item} />
-          </li>
+        {mains.map((item) => (
+          <Ingredient {...item} key={item._id} />
         ))}
       </ul>
       {bun && <Ingredient bun position="bottom" {...bun} />}

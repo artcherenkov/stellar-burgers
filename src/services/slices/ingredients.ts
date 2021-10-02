@@ -24,6 +24,7 @@ interface IIngredientsState {
     mains: TIdWithQty[];
     price: number;
   };
+  dragging: string;
 }
 
 const initialState: IIngredientsState = {
@@ -40,6 +41,7 @@ const initialState: IIngredientsState = {
     mains: [],
     price: 0,
   },
+  dragging: "",
 };
 
 const countPrice = (state: IIngredientsState) => {
@@ -116,6 +118,35 @@ export const ingredients = createSlice({
       );
       state.constructor.price = countPrice(state);
     },
+    setDragging: (state, action: PayloadAction<string>) => {
+      state.dragging = action.payload;
+    },
+    swapIngredients: (state, action: PayloadAction<string>) => {
+      const draggingIndex = [...state.constructor.mains].findIndex(
+        (ing) => ing.id === state.dragging
+      );
+      const hoveredIndex = [...state.constructor.mains].findIndex(
+        (ing) => ing.id === action.payload
+      );
+
+      const initial = [...state.constructor.mains];
+
+      if (draggingIndex > hoveredIndex) {
+        state.constructor.mains = [
+          ...initial.slice(0, draggingIndex - 1),
+          initial[draggingIndex],
+          initial[hoveredIndex],
+          ...initial.slice(draggingIndex + 1),
+        ];
+      } else if (draggingIndex < hoveredIndex) {
+        state.constructor.mains = [
+          ...initial.slice(0, hoveredIndex - 1),
+          initial[hoveredIndex],
+          initial[draggingIndex],
+          ...initial.slice(hoveredIndex + 1),
+        ];
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchIngredients.pending, (state) => {
@@ -175,6 +206,8 @@ export const {
   resetActiveIngredient,
   addIngredient,
   deleteIngredient,
+  setDragging,
+  swapIngredients,
 } = actions;
 
 export default reducer;

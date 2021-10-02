@@ -15,6 +15,8 @@ import {
   selectActiveIngredient,
   selectIsDetailsPopupOpen,
 } from "../../services/slices/ingredients";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export const ANIMATION_DURATION = 300; // мс
 
@@ -33,18 +35,20 @@ const App = () => {
   };
 
   return (
-    <div className={styles.root}>
-      <AppHeader />
-      <div className={styles.burgerContainer}>
-        <BurgerIngredients />
-        <BurgerConstructor />
-        <Modal open={isDetailsPopupOpen} onClose={onModalClose}>
-          {activeIngredient && (
-            <IngredientDetails ingredient={activeIngredient} />
-          )}
-        </Modal>
+    <DndProvider backend={HTML5Backend}>
+      <div className={styles.root}>
+        <AppHeader />
+        <div className={styles.burgerContainer}>
+          <BurgerIngredients />
+          <BurgerConstructor />
+          <Modal open={isDetailsPopupOpen} onClose={onModalClose}>
+            {activeIngredient && (
+              <IngredientDetails ingredient={activeIngredient} />
+            )}
+          </Modal>
+        </div>
       </div>
-    </div>
+    </DndProvider>
   );
 };
 

@@ -2,17 +2,14 @@ import styles from "../../burger-ingredients.module.css";
 import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components";
 import cn from "classnames";
 import { TIngredient } from "../../../app/app.typed";
-import {
-  addIngredient,
-  openDetailsPopup,
-} from "../../../../services/slices/ingredients";
+import { addIngredient } from "../../../../services/slices/ingredients";
 import { useAppDispatch } from "../../../../services/hooks";
 
 const Ingredient = (props: TIngredient) => {
   const dispatch = useAppDispatch();
 
   const onClick = () => {
-    dispatch(openDetailsPopup(props._id));
+    // dispatch(openDetailsPopup(props._id));
     dispatch(addIngredient(props._id));
   };
 
