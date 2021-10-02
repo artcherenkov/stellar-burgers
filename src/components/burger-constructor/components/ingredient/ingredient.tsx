@@ -83,10 +83,8 @@ const Ingredient = (props: IIngredient) => {
 
   return (
     <li
-      style={{
-        marginBottom: 16,
-      }}
       ref={dropTarget}
+      className={styles.listItem}
     >
       <div className={styles.item} ref={ref}>
         <button className={styles.button}>

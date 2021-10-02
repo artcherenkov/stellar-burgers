@@ -10,6 +10,7 @@ import Modal from "../modal/modal";
 import OrderDetails from "../order-details/order-details";
 import { useAppDispatch, useAppSelector } from "../../services/hooks";
 import {
+  addIngredient,
   selectBun,
   selectMains,
   selectPrice,
@@ -23,6 +24,7 @@ import {
   selectOrderDetails,
   selectOrderLoading,
 } from "../../services/slices/order";
+import { useDrop } from "react-dnd";
 
 const BurgerConstructor = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +36,16 @@ const BurgerConstructor = () => {
   const orderLoading = useAppSelector(selectOrderLoading);
   const isOrderPopupOpen = useAppSelector(selectIsOrderPopupOpen);
 
+  const [{ isHover }, dropTarget] = useDrop({
+    accept: "ingredient-from-menu",
+    collect: (monitor) => ({
+      isHover: monitor.isOver(),
+    }),
+    drop(item: { id: string }) {
+      dispatch(addIngredient(item.id));
+    },
+  });
+
   const onOrderSubmit = () => {
     if (!bun || orderLoading) return;
     const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
@@ -43,7 +55,10 @@ const BurgerConstructor = () => {
   const onClose = () => dispatch(closeOrderPopup());
 
   return (
-    <section className={cn(styles.root, "ml-10")}>
+    <section
+      className={cn(styles.root, "ml-10", { [styles.root_over]: isHover })}
+      ref={dropTarget}
+    >
       {bun && <Ingredient bun position="top" {...bun} />}
       <ul className={cn(styles.list, "custom-scroll")}>
         {mains.map((item) => (
@@ -52,14 +67,16 @@ const BurgerConstructor = () => {
       </ul>
       {bun && <Ingredient bun position="bottom" {...bun} />}
 
-      <div className={cn(styles.results, "mt-10")}>
-        <p className={cn(styles.totalCost, "mr-10")}>
-          <span className="text text_type_digits-medium mr-2">{price}</span>
-          <CurrencyIcon type="primary" />
-        </p>
-        <Button type="primary" size="large" onClick={onOrderSubmit}>
-          {orderLoading ? "Загрузка..." : "Оформить заказ"}
-        </Button>
+      <div style={{ marginTop: "auto" }}>
+        <div className={cn(styles.results, "mt-10")}>
+          <p className={cn(styles.totalCost, "mr-10")}>
+            <span className="text text_type_digits-medium mr-2">{price}</span>
+            <CurrencyIcon type="primary" />
+          </p>
+          <Button type="primary" size="large" onClick={onOrderSubmit}>
+            {orderLoading ? "Загрузка..." : "Оформить заказ"}
+          </Button>
+        </div>
       </div>
 
       <Modal open={isOrderPopupOpen} onClose={onClose}>
