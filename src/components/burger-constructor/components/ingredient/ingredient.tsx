@@ -71,7 +71,7 @@ const Ingredient = (props: IIngredient) => {
         )}
       >
         <ConstructorElement
-          type="top"
+          type={props.position}
           isLocked={true}
           text={props.name + position}
           price={props.price}
