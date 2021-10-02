@@ -82,10 +82,7 @@ const Ingredient = (props: IIngredient) => {
   }
 
   return (
-    <li
-      ref={dropTarget}
-      className={styles.listItem}
-    >
+    <li ref={dropTarget} className={styles.listItem}>
       <div className={styles.item} ref={ref}>
         <button className={styles.button}>
           <DragIcon type="primary" />

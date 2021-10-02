@@ -113,9 +113,21 @@ export const ingredients = createSlice({
       );
       if (!ingredient || ingredient.type === IngredientType.BUN) return;
 
-      state.constructor.mains = state.constructor.mains.filter(
-        (main) => main.id !== action.payload
+      const deletingIngredientIndex = state.constructor.mains.findIndex(
+        (i) => i.id === action.payload
       );
+      if (deletingIngredientIndex === -1) return;
+
+      const deletingIngredient =
+        state.constructor.mains[deletingIngredientIndex];
+      if (deletingIngredient.qty > 1) {
+        deletingIngredient.qty -= 1;
+      } else {
+        state.constructor.mains = state.constructor.mains.filter(
+          (i) => i.id !== action.payload
+        );
+      }
+
       state.constructor.price = countPrice(state);
     },
     setDragging: (state, action: PayloadAction<string>) => {
@@ -196,6 +208,18 @@ export const selectMains = (state: RootState) => {
 };
 export const selectPrice = (state: RootState) => {
   return state.ingredients.constructor.price;
+};
+export const selectIngredientQty = (id: string) => (state: RootState) => {
+  const ingredient = state.ingredients.ingredients.find((i) => i._id === id);
+  if (!ingredient) return 0;
+
+  if (ingredient.type === IngredientType.BUN) {
+    const bun = state.ingredients.constructor.bun;
+    return bun && bun.id === id ? bun.qty : 0;
+  }
+
+  const main = state.ingredients.constructor.mains.find((i) => i.id === id);
+  return main ? main.qty : 0;
 };
 
 const { actions, reducer } = ingredients;
