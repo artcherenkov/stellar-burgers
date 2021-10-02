@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 
 import AppHeader from "../app-header/app-header";
 import BurgerIngredients from "../burger-ingredients/burger-ingredients";
@@ -6,8 +6,6 @@ import BurgerConstructor from "../burger-constructor/burger-constructor";
 import Modal from "../modal/modal";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import styles from "./app.module.css";
-import { getIngredients } from "../../utils/api";
-import IngredientsContext from "../../context/IngredientsContext";
 import {
   ActionType,
   IAction,
@@ -16,14 +14,22 @@ import {
   TIngredient,
   TIngredientWithCount,
 } from "./app.typed";
-import { useAppDispatch } from "../../services/hooks";
-import { fetchIngredients } from "../../services/ingredientsSlice";
+import { useAppDispatch, useAppSelector } from "../../services/hooks";
+import {
+  closeDetailsPopup,
+  fetchIngredients,
+  resetActiveIngredient,
+  selectActiveIngredient,
+  selectIngredients,
+  selectIsDetailsPopupOpen,
+} from "../../services/ingredientsSlice";
 
 const ErrorMessage = {
   BUN_REQUIRED: "В качестве булки нельзя добавлять другие ингредиенты.",
   BUN_FORBIDDEN: "Булку нельзя добавить в качестве главного ингредиента.",
   UNDEFINED_INGREDIENT: "Ингредиента с указанным id не существует",
 };
+export const ANIMATION_DURATION = 300; // мс
 
 const getIngredientById = (arr: TIngredient[], id: string) => {
   const result = arr.find((i) => i._id === id);
@@ -96,18 +102,14 @@ const reducer = (state: IConstructorState, action: IAction) => {
 };
 
 const App = () => {
-  const [data, setData] = useState<TIngredient[]>([]);
   const dispatch = useAppDispatch();
+  const ingredients = useAppSelector(selectIngredients);
+  const activeIngredient = useAppSelector(selectActiveIngredient);
+  const isDetailsPopupOpen = useAppSelector(selectIsDetailsPopupOpen);
 
   useEffect(() => {
     dispatch(fetchIngredients());
-    getIngredients()
-      .then(({ data }) => setData(data))
-      .catch((err) => console.log(err));
   }, [dispatch]);
-
-  const [detailsPopupOpen, setDetailsPopupOpen] = useState(false);
-  const [activeIngredientId, setActiveIngredientId] = useState("");
 
   const [constructorState, constructorDispatch] = useReducer(
     reducer,
@@ -115,12 +117,12 @@ const App = () => {
   );
 
   const onModalClose = () => {
-    setDetailsPopupOpen(false);
-    setTimeout(() => setActiveIngredientId(""), 300);
+    dispatch(closeDetailsPopup());
+    setTimeout(() => dispatch(resetActiveIngredient()), ANIMATION_DURATION);
   };
 
   const onIngredientClick = (ingredientId: string) => {
-    const ingredient = getIngredientById(data, ingredientId);
+    const ingredient = getIngredientById(ingredients, ingredientId);
     if (ingredient.type === IngredientType.BUN) {
       constructorDispatch({ type: ActionType.ADD_BUN, payload: ingredient });
     } else {
@@ -129,14 +131,6 @@ const App = () => {
         payload: ingredient,
       });
     }
-
-    setDetailsPopupOpen(true);
-    setActiveIngredientId(ingredientId);
-  };
-
-  const onConstructorIngredientClick = (ingredientId: string) => {
-    setDetailsPopupOpen(true);
-    setActiveIngredientId(ingredientId);
   };
 
   const onDeleteIngredientClick = (ingredientId: string) => {
@@ -146,36 +140,26 @@ const App = () => {
     });
   };
 
-  const activeIngredient = useMemo(() => {
-    if (activeIngredientId) {
-      return getIngredientById(data, activeIngredientId);
-    }
-    return null;
-  }, [data, activeIngredientId]);
-
-  if (!data.length) {
+  if (!ingredients.length) {
     return <p>Loading...</p>;
   }
 
   return (
-    <IngredientsContext.Provider value={data}>
-      <div className={styles.root}>
-        <AppHeader />
-        <div className={styles.burgerContainer}>
-          <BurgerIngredients onIngredientClick={onIngredientClick} />
-          <BurgerConstructor
-            constructorState={constructorState}
-            onIngredientClick={onConstructorIngredientClick}
-            onDeleteClick={onDeleteIngredientClick}
-          />
-          <Modal open={detailsPopupOpen} onClose={onModalClose}>
-            {activeIngredient && (
-              <IngredientDetails ingredient={activeIngredient} />
-            )}
-          </Modal>
-        </div>
+    <div className={styles.root}>
+      <AppHeader />
+      <div className={styles.burgerContainer}>
+        <BurgerIngredients onIngredientClick={onIngredientClick} />
+        <BurgerConstructor
+          constructorState={constructorState}
+          onDeleteClick={onDeleteIngredientClick}
+        />
+        <Modal open={isDetailsPopupOpen} onClose={onModalClose}>
+          {activeIngredient && (
+            <IngredientDetails ingredient={activeIngredient} />
+          )}
+        </Modal>
       </div>
-    </IngredientsContext.Provider>
+    </div>
   );
 };
 

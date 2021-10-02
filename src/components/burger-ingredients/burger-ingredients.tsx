@@ -1,11 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 
 import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-import IngredientsContext from "../../context/IngredientsContext";
 import { IngredientType, TIngredient } from "../app/app.typed";
+import { useAppSelector } from "../../services/hooks";
+import { selectIngredients } from "../../services/ingredientsSlice";
 
 interface IBurgerIngredients {
   onIngredientClick: (id: string) => void;
@@ -19,7 +20,7 @@ const sortIngredientsByType = (data: TIngredient[]) => {
 };
 
 const BurgerIngredients = (props: IBurgerIngredients) => {
-  const ingredients = useContext(IngredientsContext);
+  const ingredients = useAppSelector(selectIngredients);
 
   const [current, setCurrent] = useState(IngredientType.BUN);
   const { buns, mains, sauces } = sortIngredientsByType(ingredients);

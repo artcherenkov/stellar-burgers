@@ -6,14 +6,16 @@ import {
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import styles from "./burger-constructor.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { postOrder } from "../../utils/api";
 import Modal from "../modal/modal";
 import OrderDetails from "../order-details/order-details";
 import { IConstructorState, TIngredient } from "../app/app.typed";
+import { useAppDispatch } from "../../services/hooks";
+import { openDetailsPopup } from "../../services/ingredientsSlice";
+import { ANIMATION_DURATION } from "../app/app";
 
 interface IBurgerConstructor {
-  onIngredientClick: (id: string) => void;
   onDeleteClick: (id: string) => void;
   constructorState: IConstructorState;
 }
@@ -25,8 +27,6 @@ const DEFAULT_ORDER_DETAILS = {
   },
   success: false,
 };
-
-const ANIMATION_DURATION = 300; // мс
 
 const BurgerConstructor = (props: IBurgerConstructor) => {
   const { constructorState } = props;
@@ -67,11 +67,15 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
       .finally(() => setIsLoading(false));
   };
 
-  const onBunClick = () => {
-    if (constructorState.bun) {
-      props.onIngredientClick(constructorState.bun._id);
-    }
-  };
+  const dispatch = useAppDispatch();
+
+  const onIngredientClick = useCallback(
+    (id: string | undefined) => {
+      if (!id) return;
+      dispatch(openDetailsPopup(id));
+    },
+    [dispatch]
+  );
 
   return (
     <section className={cn(styles.root, "ml-10")}>
@@ -81,7 +85,7 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
             styles.ingredientContainer,
             styles.ingredientContainer_outter
           )}
-          onClick={onBunClick}
+          onClick={() => onIngredientClick(constructorState.bun?._id)}
         >
           <ConstructorElement
             type="top"
@@ -98,9 +102,7 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
             <Ingredient
               {...item}
               onDeleteClick={() => props.onDeleteClick(item._id)}
-              onClick={() => {
-                props.onIngredientClick(item._id);
-              }}
+              onClick={() => onIngredientClick(item._id)}
             />
           </li>
         ))}
@@ -111,7 +113,7 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
             styles.ingredientContainer,
             styles.ingredientContainer_outter
           )}
-          onClick={onBunClick}
+          onClick={() => onIngredientClick(constructorState.bun?._id)}
         >
           <ConstructorElement
             type="bottom"
