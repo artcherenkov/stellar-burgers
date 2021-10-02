@@ -1,33 +1,49 @@
-import { SyntheticEvent, useRef } from "react";
 import {
   ConstructorElement,
   DragIcon,
 } from "@ya.praktikum/react-developer-burger-ui-components";
-import styles from "../../burger-constructor.module.css";
 import { TIngredientWithCount } from "../../../app/app.typed";
-
-const DELETE_BUTTON_SELECTOR = ".constructor-element__action";
+import styles from "../../burger-constructor.module.css";
+import {
+  deleteIngredient,
+  openDetailsPopup,
+} from "../../../../services/ingredientsSlice";
+import { useAppDispatch } from "../../../../services/hooks";
+import { useOnIngredientClick } from "./ingredient.utils";
+import cn from "classnames";
 
 interface IIngredient extends TIngredientWithCount {
-  onClick: () => void;
-  onDeleteClick: () => void;
+  bun?: boolean;
+  position?: "top" | "bottom";
 }
 
 const Ingredient = (props: IIngredient) => {
-  // костыль, чтобы не вызывать onClick, если кликнули по кнопке удаления ингредиента
-  const containerRef = useRef<HTMLDivElement>(null);
-  const onClick = (evt: SyntheticEvent) => {
-    if (!containerRef.current) return;
+  const dispatch = useAppDispatch();
 
-    const deleteButtonElement = containerRef.current.querySelector(
-      DELETE_BUTTON_SELECTOR
-    )!;
-    const targetElement = evt.target as Node;
+  const onDeleteClick = () => dispatch(deleteIngredient(props._id));
+  const onIngredientClick = () => dispatch(openDetailsPopup(props._id));
+  const { containerRef, onClick } = useOnIngredientClick(onIngredientClick);
 
-    if (!deleteButtonElement.contains(targetElement)) {
-      props.onClick();
-    }
-  };
+  if (props.bun && props.position) {
+    const position = props.position === "top" ? " (верх)" : " (низ)";
+
+    return (
+      <div
+        className={cn(
+          styles.ingredientContainer,
+          styles.ingredientContainer_outter
+        )}
+      >
+        <ConstructorElement
+          type="top"
+          isLocked={true}
+          text={props.name + position}
+          price={props.price}
+          thumbnail={props.image}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -43,7 +59,7 @@ const Ingredient = (props: IIngredient) => {
           text={props.count < 2 ? props.name : `${props.name} x${props.count}`}
           price={props.price}
           thumbnail={props.image}
-          handleClose={props.onDeleteClick}
+          handleClose={onDeleteClick}
         />
       </div>
     </>

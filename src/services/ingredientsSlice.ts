@@ -195,8 +195,14 @@ export const selectActiveIngredient = (state: RootState) =>
 export const selectIsDetailsPopupOpen = (state: RootState) =>
   state.isDetailsPopupOpen;
 
-export const selectBun = (state: RootState) =>
-  state.ingredients.find((i) => i._id === state.constructor.bun?.id);
+export const selectBun = (state: RootState) => {
+  const bun = state.ingredients.find(
+    (i) => i._id === state.constructor.bun?.id
+  );
+  if (!bun) return null;
+
+  return { ...bun, count: 2 };
+};
 
 export const selectMains = (state: RootState) =>
   state.constructor.mains.map((main) => {

@@ -2,18 +2,12 @@ import React, { useState } from "react";
 import cn from "classnames";
 import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 
-import styles from "./burger-ingredients.module.css";
 import Ingredient from "./components/ingredient/ingredient";
 import { IngredientType, TIngredient } from "../app/app.typed";
 import { useAppSelector } from "../../services/hooks";
 import { selectIngredients } from "../../services/ingredientsSlice";
-
-const sortIngredientsByType = (data: TIngredient[]) => {
-  const buns = data.filter((i) => i.type === IngredientType.BUN);
-  const mains = data.filter((i) => i.type === IngredientType.MAIN);
-  const sauces = data.filter((i) => i.type === IngredientType.SAUCE);
-  return { buns, mains, sauces };
-};
+import { sortIngredientsByType } from "./burger-ingredients.utils";
+import styles from "./burger-ingredients.module.css";
 
 const BurgerIngredients = () => {
   const ingredients = useAppSelector(selectIngredients);
