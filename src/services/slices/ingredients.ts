@@ -1,66 +1,45 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IngredientType, TIngredient } from "../components/app/app.typed";
-import { getIngredients, postOrder } from "../utils/api";
-import { AppDispatch, RootState } from "./store";
+import { IngredientType, TIngredient } from "../../components/app/app.typed";
+import { getIngredients } from "../../utils/api";
+import { RootState } from "../store";
 
 /** Тип ответа сервера при запросе ингредиентов. */
 type TIngredientResponse = PayloadAction<{
   data: TIngredient[];
   success: boolean;
 }>;
-type TOrderDetails = {
-  name: string;
-  order: {
-    number: number;
-  };
-  success: boolean;
-};
 type TIdWithQty = { id: string; qty: number };
 
 interface IIngredientsState {
+  // ingredients
   ingredients: TIngredient[];
   ingredientsLoading: boolean;
   ingredientsError: boolean;
-
-  isDetailsPopupOpen: boolean;
   activeIngredientId: string;
+  isDetailsPopupOpen: boolean;
 
+  // constructor
   constructor: {
     bun: null | TIdWithQty;
     mains: TIdWithQty[];
     price: number;
   };
-
-  orderDetails: TOrderDetails;
-  orderDetailsLoading: boolean;
-  orderDetailsError: boolean;
-  isOrderPopupOpen: boolean;
 }
 
 const initialState: IIngredientsState = {
+  // ingredients
   ingredients: [],
   ingredientsLoading: false,
   ingredientsError: false,
-
-  isDetailsPopupOpen: false,
   activeIngredientId: "",
+  isDetailsPopupOpen: false,
 
+  // constructor
   constructor: {
     bun: null,
     mains: [],
     price: 0,
   },
-
-  orderDetails: {
-    name: "",
-    order: {
-      number: -1,
-    },
-    success: false,
-  },
-  orderDetailsLoading: false,
-  orderDetailsError: false,
-  isOrderPopupOpen: false,
 };
 
 const countPrice = (state: IIngredientsState) => {
@@ -80,24 +59,12 @@ export const fetchIngredients = createAsyncThunk(
   "ingredients/fetchIngredients",
   getIngredients
 );
-export const fetchOrder = createAsyncThunk<
-  TOrderDetails,
-  void,
-  { state: RootState; dispatch: AppDispatch }
->("ingredients/postOrder", (_never, thunkApi) => {
-  const state = thunkApi.getState();
-  const ingredients = [...state.constructor.mains];
-  if (state.constructor.bun) {
-    ingredients.push(state.constructor.bun);
-  }
 
-  return postOrder({ ingredients: ingredients.map((ing) => ing.id) });
-});
-export const ingredientsSlice = createSlice({
+export const ingredients = createSlice({
   name: "ingredients",
   initialState,
   reducers: {
-    // взаимодействие с попапом
+    // взаимодействие с попапом ингредиента
     openDetailsPopup: (state, action: PayloadAction<string>) => {
       state.isDetailsPopupOpen = true;
       state.activeIngredientId = action.payload;
@@ -149,12 +116,6 @@ export const ingredientsSlice = createSlice({
       );
       state.constructor.price = countPrice(state);
     },
-    openOrderPopup: (state) => {
-      state.isOrderPopupOpen = true;
-    },
-    closeOrderPopup: (state) => {
-      state.isOrderPopupOpen = false;
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchIngredients.pending, (state) => {
@@ -172,55 +133,41 @@ export const ingredientsSlice = createSlice({
     builder.addCase(fetchIngredients.rejected, (state) => {
       state.ingredientsError = true;
     });
-
-    builder.addCase(fetchOrder.pending, (state) => {
-      state.orderDetailsLoading = true;
-    });
-    builder.addCase(fetchOrder.fulfilled, (state, action) => {
-      state.orderDetails = action.payload;
-      state.orderDetailsLoading = false;
-      state.orderDetailsError = false;
-    });
-    builder.addCase(fetchOrder.rejected, (state) => {
-      state.ingredientsError = true;
-    });
   },
 });
 
-export const selectIngredients = (state: RootState) => state.ingredients;
-
-export const selectActiveIngredient = (state: RootState) =>
-  state.ingredients.find((i) => i._id === state.activeIngredientId);
-
-export const selectIsDetailsPopupOpen = (state: RootState) =>
-  state.isDetailsPopupOpen;
-
+export const selectIngredients = (state: RootState) => {
+  return state.ingredients.ingredients;
+};
+export const selectActiveIngredient = (state: RootState) => {
+  return state.ingredients.ingredients.find(
+    (i) => i._id === state.ingredients.activeIngredientId
+  );
+};
+export const selectIsDetailsPopupOpen = (state: RootState) => {
+  return state.ingredients.isDetailsPopupOpen;
+};
 export const selectBun = (state: RootState) => {
-  const bun = state.ingredients.find(
-    (i) => i._id === state.constructor.bun?.id
+  const bun = state.ingredients.ingredients.find(
+    (i) => i._id === state.ingredients.constructor.bun?.id
   );
   if (!bun) return null;
 
   return { ...bun, count: 2 };
 };
-
-export const selectMains = (state: RootState) =>
-  state.constructor.mains.map((main) => {
-    const foundIngredient = state.ingredients.find(
+export const selectMains = (state: RootState) => {
+  return state.ingredients.constructor.mains.map((main) => {
+    const foundIngredient = state.ingredients.ingredients.find(
       (ingredient) => ingredient._id === main.id
     )!;
     return { ...foundIngredient, count: main.qty };
   });
+};
+export const selectPrice = (state: RootState) => {
+  return state.ingredients.constructor.price;
+};
 
-export const selectPrice = (state: RootState) => state.constructor.price;
-
-export const selectOrderDetails = (state: RootState) => state.orderDetails;
-export const selectOrderLoading = (state: RootState) =>
-  state.orderDetailsLoading;
-export const selectIsOrderPopupOpen = (state: RootState) =>
-  state.isOrderPopupOpen;
-
-const { actions, reducer } = ingredientsSlice;
+const { actions, reducer } = ingredients;
 
 export const {
   closeDetailsPopup,
@@ -228,8 +175,6 @@ export const {
   resetActiveIngredient,
   addIngredient,
   deleteIngredient,
-  openOrderPopup,
-  closeOrderPopup,
 } = actions;
 
 export default reducer;

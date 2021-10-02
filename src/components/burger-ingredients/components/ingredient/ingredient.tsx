@@ -5,7 +5,7 @@ import { TIngredient } from "../../../app/app.typed";
 import {
   addIngredient,
   openDetailsPopup,
-} from "../../../../services/ingredientsSlice";
+} from "../../../../services/slices/ingredients";
 import { useAppDispatch } from "../../../../services/hooks";
 
 const Ingredient = (props: TIngredient) => {

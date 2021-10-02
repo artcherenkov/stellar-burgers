@@ -5,7 +5,7 @@ import { Tab } from "@ya.praktikum/react-developer-burger-ui-components";
 import Ingredient from "./components/ingredient/ingredient";
 import { IngredientType, TIngredient } from "../app/app.typed";
 import { useAppSelector } from "../../services/hooks";
-import { selectIngredients } from "../../services/ingredientsSlice";
+import { selectIngredients } from "../../services/slices/ingredients";
 import { sortIngredientsByType } from "./burger-ingredients.utils";
 import styles from "./burger-ingredients.module.css";
 

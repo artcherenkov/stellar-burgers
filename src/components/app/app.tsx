@@ -14,7 +14,7 @@ import {
   resetActiveIngredient,
   selectActiveIngredient,
   selectIsDetailsPopupOpen,
-} from "../../services/ingredientsSlice";
+} from "../../services/slices/ingredients";
 
 export const ANIMATION_DURATION = 300; // мс
 

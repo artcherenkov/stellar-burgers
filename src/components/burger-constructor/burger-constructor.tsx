@@ -10,17 +10,19 @@ import Modal from "../modal/modal";
 import OrderDetails from "../order-details/order-details";
 import { useAppDispatch, useAppSelector } from "../../services/hooks";
 import {
-  closeOrderPopup,
+  selectBun,
+  selectMains,
+  selectPrice,
+} from "../../services/slices/ingredients";
+import styles from "./burger-constructor.module.css";
+import {
   fetchOrder,
   openOrderPopup,
-  selectBun,
+  closeOrderPopup,
   selectIsOrderPopupOpen,
-  selectMains,
   selectOrderDetails,
   selectOrderLoading,
-  selectPrice,
-} from "../../services/ingredientsSlice";
-import styles from "./burger-constructor.module.css";
+} from "../../services/slices/order";
 
 const BurgerConstructor = () => {
   const dispatch = useAppDispatch();
@@ -34,7 +36,8 @@ const BurgerConstructor = () => {
 
   const onOrderSubmit = () => {
     if (!bun || orderLoading) return;
-    dispatch(fetchOrder()).then(() => dispatch(openOrderPopup()));
+    const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
+    dispatch(fetchOrder(ingredientsIds)).then(() => dispatch(openOrderPopup()));
   };
 
   const onClose = () => dispatch(closeOrderPopup());

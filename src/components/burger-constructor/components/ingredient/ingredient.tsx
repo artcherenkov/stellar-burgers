@@ -7,7 +7,7 @@ import styles from "../../burger-constructor.module.css";
 import {
   deleteIngredient,
   openDetailsPopup,
-} from "../../../../services/ingredientsSlice";
+} from "../../../../services/slices/ingredients";
 import { useAppDispatch } from "../../../../services/hooks";
 import { useOnIngredientClick } from "./ingredient.utils";
 import cn from "classnames";
