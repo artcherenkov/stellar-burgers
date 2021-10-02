@@ -6,68 +6,39 @@ import {
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import styles from "./burger-constructor.module.css";
 import Ingredient from "./components/ingredient/ingredient";
-import React, { useCallback, useState } from "react";
-import { postOrder } from "../../utils/api";
+import React, { useCallback } from "react";
 import Modal from "../modal/modal";
 import OrderDetails from "../order-details/order-details";
-import { IConstructorState, TIngredient } from "../app/app.typed";
-import { useAppDispatch } from "../../services/hooks";
-import { openDetailsPopup } from "../../services/ingredientsSlice";
-import { ANIMATION_DURATION } from "../app/app";
+import { useAppDispatch, useAppSelector } from "../../services/hooks";
+import {
+  closeOrderPopup,
+  deleteIngredient,
+  fetchOrder,
+  openDetailsPopup,
+  openOrderPopup,
+  selectBun,
+  selectIsOrderPopupOpen,
+  selectMains,
+  selectOrderDetails,
+  selectOrderLoading,
+  selectPrice,
+} from "../../services/ingredientsSlice";
 
-interface IBurgerConstructor {
-  onDeleteClick: (id: string) => void;
-  constructorState: IConstructorState;
-}
+const BurgerConstructor = () => {
+  const dispatch = useAppDispatch();
 
-const DEFAULT_ORDER_DETAILS = {
-  name: "",
-  order: {
-    number: -1,
-  },
-  success: false,
-};
-
-const BurgerConstructor = (props: IBurgerConstructor) => {
-  const { constructorState } = props;
-
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(DEFAULT_ORDER_DETAILS);
-  const onClosePopup = () => {
-    setIsPopupOpen(false);
-    // очистить поля после плавного закрытия попапа
-    setTimeout(
-      () => setOrderDetails(DEFAULT_ORDER_DETAILS),
-      ANIMATION_DURATION
-    );
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const getIngredientsIds = (ingredients: TIngredient[]) =>
-    ingredients.map((i) => i._id);
+  const bun = useAppSelector(selectBun);
+  const mains = useAppSelector(selectMains);
+  const price = useAppSelector(selectPrice);
+  const orderDetails = useAppSelector(selectOrderDetails);
+  const orderLoading = useAppSelector(selectOrderLoading);
+  const isOrderPopupOpen = useAppSelector(selectIsOrderPopupOpen);
 
   const onOrderSubmit = () => {
-    if (!constructorState.bun) {
-      return;
-    }
-
-    const ingredientsIds = getIngredientsIds([
-      constructorState.bun,
-      ...constructorState.mains,
-    ]);
-
-    setIsLoading(true);
-    postOrder({ ingredients: ingredientsIds })
-      .then((data) => {
-        setOrderDetails(data);
-        setIsPopupOpen(true);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
+    dispatch(fetchOrder()).then(() => dispatch(openOrderPopup()));
   };
 
-  const dispatch = useAppDispatch();
+  const onClose = () => dispatch(closeOrderPopup());
 
   const onIngredientClick = useCallback(
     (id: string | undefined) => {
@@ -77,67 +48,72 @@ const BurgerConstructor = (props: IBurgerConstructor) => {
     [dispatch]
   );
 
+  const onDeleteClick = useCallback(
+    (id: string) => {
+      dispatch(deleteIngredient(id));
+    },
+    [dispatch]
+  );
+
   return (
     <section className={cn(styles.root, "ml-10")}>
-      {constructorState.bun && (
+      {bun && (
         <div
           className={cn(
             styles.ingredientContainer,
             styles.ingredientContainer_outter
           )}
-          onClick={() => onIngredientClick(constructorState.bun?._id)}
+          onClick={() => onIngredientClick(bun?._id)}
         >
           <ConstructorElement
             type="top"
             isLocked={true}
-            text={`${constructorState.bun.name} (верх)`}
-            price={constructorState.bun.price}
-            thumbnail={constructorState.bun.image}
+            text={`${bun.name} (верх)`}
+            price={bun.price}
+            thumbnail={bun.image}
           />
         </div>
       )}
       <ul className={cn(styles.list, "custom-scroll")}>
-        {constructorState.mains.map((item, idx) => (
+        {mains.map((item, idx) => (
           <li className={styles.item} key={`${item._id}-${idx}`}>
             <Ingredient
               {...item}
-              onDeleteClick={() => props.onDeleteClick(item._id)}
+              onDeleteClick={() => onDeleteClick(item._id)}
               onClick={() => onIngredientClick(item._id)}
             />
           </li>
         ))}
       </ul>
-      {constructorState.bun && (
+      {bun && (
         <div
           className={cn(
             styles.ingredientContainer,
             styles.ingredientContainer_outter
           )}
-          onClick={() => onIngredientClick(constructorState.bun?._id)}
+          onClick={() => onIngredientClick(bun?._id)}
         >
           <ConstructorElement
             type="bottom"
             isLocked={true}
-            text={`${constructorState.bun.name} (низ)`}
-            price={constructorState.bun.price}
-            thumbnail={constructorState.bun.image}
+            text={`${bun.name} (низ)`}
+            price={bun.price}
+            thumbnail={bun.image}
           />
         </div>
       )}
 
       <div className={cn(styles.results, "mt-10")}>
         <p className={cn(styles.totalCost, "mr-10")}>
-          <span className="text text_type_digits-medium mr-2">
-            {constructorState.price}
-          </span>
+          <span className="text text_type_digits-medium mr-2">{price}</span>
           <CurrencyIcon type="primary" />
         </p>
         <Button type="primary" size="large" onClick={onOrderSubmit}>
-          {isLoading ? "Загрузка..." : "Оформить заказ"}
+          {orderLoading ? "Загрузка..." : "Оформить заказ"}
         </Button>
       </div>
 
-      <Modal open={isPopupOpen} onClose={onClosePopup}>
+      <Modal open={isOrderPopupOpen} onClose={onClose}>
         <OrderDetails {...orderDetails} />
       </Modal>
     </section>

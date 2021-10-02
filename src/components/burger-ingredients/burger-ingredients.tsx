@@ -8,10 +8,6 @@ import { IngredientType, TIngredient } from "../app/app.typed";
 import { useAppSelector } from "../../services/hooks";
 import { selectIngredients } from "../../services/ingredientsSlice";
 
-interface IBurgerIngredients {
-  onIngredientClick: (id: string) => void;
-}
-
 const sortIngredientsByType = (data: TIngredient[]) => {
   const buns = data.filter((i) => i.type === IngredientType.BUN);
   const mains = data.filter((i) => i.type === IngredientType.MAIN);
@@ -19,7 +15,7 @@ const sortIngredientsByType = (data: TIngredient[]) => {
   return { buns, mains, sauces };
 };
 
-const BurgerIngredients = (props: IBurgerIngredients) => {
+const BurgerIngredients = () => {
   const ingredients = useAppSelector(selectIngredients);
 
   const [current, setCurrent] = useState(IngredientType.BUN);
@@ -29,7 +25,7 @@ const BurgerIngredients = (props: IBurgerIngredients) => {
 
   const renderIngredient = (item: TIngredient) => (
     <li className={styles.ingredientsItem} key={item._id}>
-      <Ingredient {...item} onClick={() => props.onIngredientClick(item._id)} />
+      <Ingredient {...item} />
     </li>
   );
 

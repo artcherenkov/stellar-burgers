@@ -2,19 +2,18 @@ import styles from "../../burger-ingredients.module.css";
 import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components";
 import cn from "classnames";
 import { TIngredient } from "../../../app/app.typed";
-import { openDetailsPopup } from "../../../../services/ingredientsSlice";
+import {
+  addIngredient,
+  openDetailsPopup,
+} from "../../../../services/ingredientsSlice";
 import { useAppDispatch } from "../../../../services/hooks";
 
-interface IIngredient extends TIngredient {
-  onClick: () => void;
-}
-
-const Ingredient = (props: IIngredient) => {
+const Ingredient = (props: TIngredient) => {
   const dispatch = useAppDispatch();
 
   const onClick = () => {
     dispatch(openDetailsPopup(props._id));
-    props.onClick();
+    dispatch(addIngredient(props._id));
   };
 
   return (
