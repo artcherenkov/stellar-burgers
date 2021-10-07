@@ -1,141 +1,85 @@
 import cn from "classnames";
+import React from "react";
 import {
   Button,
-  ConstructorElement,
   CurrencyIcon,
 } from "@ya.praktikum/react-developer-burger-ui-components";
-import styles from "./burger-constructor.module.css";
+
 import Ingredient from "./components/ingredient/ingredient";
-import React, { useState } from "react";
-import { postOrder } from "../../utils/api";
 import Modal from "../modal/modal";
 import OrderDetails from "../order-details/order-details";
-import { IConstructorState, TIngredient } from "../app/app.typed";
+import { useAppDispatch, useAppSelector } from "../../services/hooks";
+import {
+  addIngredient,
+  selectBun,
+  selectMains,
+  selectPrice,
+} from "../../services/slices/ingredients";
+import styles from "./burger-constructor.module.css";
+import {
+  fetchOrder,
+  openOrderPopup,
+  closeOrderPopup,
+  selectIsOrderPopupOpen,
+  selectOrderDetails,
+  selectOrderLoading,
+} from "../../services/slices/order";
+import { useDrop } from "react-dnd";
 
-interface IBurgerConstructor {
-  onIngredientClick: (id: string) => void;
-  onDeleteClick: (id: string) => void;
-  constructorState: IConstructorState;
-}
+const BurgerConstructor = () => {
+  const dispatch = useAppDispatch();
 
-const DEFAULT_ORDER_DETAILS = {
-  name: "",
-  order: {
-    number: -1,
-  },
-  success: false,
-};
+  const bun = useAppSelector(selectBun);
+  const mains = useAppSelector(selectMains);
+  const price = useAppSelector(selectPrice);
+  const orderDetails = useAppSelector(selectOrderDetails);
+  const orderLoading = useAppSelector(selectOrderLoading);
+  const isOrderPopupOpen = useAppSelector(selectIsOrderPopupOpen);
 
-const ANIMATION_DURATION = 300; // мс
-
-const BurgerConstructor = (props: IBurgerConstructor) => {
-  const { constructorState } = props;
-
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(DEFAULT_ORDER_DETAILS);
-  const onClosePopup = () => {
-    setIsPopupOpen(false);
-    // очистить поля после плавного закрытия попапа
-    setTimeout(
-      () => setOrderDetails(DEFAULT_ORDER_DETAILS),
-      ANIMATION_DURATION
-    );
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const getIngredientsIds = (ingredients: TIngredient[]) =>
-    ingredients.map((i) => i._id);
+  const [{ isHover }, dropTarget] = useDrop({
+    accept: "ingredient-from-menu",
+    collect: (monitor) => ({
+      isHover: monitor.isOver(),
+    }),
+    drop(item: { id: string }) {
+      dispatch(addIngredient(item.id));
+    },
+  });
 
   const onOrderSubmit = () => {
-    if (!constructorState.bun) {
-      return;
-    }
-
-    const ingredientsIds = getIngredientsIds([
-      constructorState.bun,
-      ...constructorState.mains,
-    ]);
-
-    setIsLoading(true);
-    postOrder({ ingredients: ingredientsIds })
-      .then((data) => {
-        setOrderDetails(data);
-        setIsPopupOpen(true);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setIsLoading(false));
+    if (!bun || orderLoading) return;
+    const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
+    dispatch(fetchOrder(ingredientsIds)).then(() => dispatch(openOrderPopup()));
   };
 
-  const onBunClick = () => {
-    if (constructorState.bun) {
-      props.onIngredientClick(constructorState.bun._id);
-    }
-  };
+  const onClose = () => dispatch(closeOrderPopup());
 
   return (
-    <section className={cn(styles.root, "ml-10")}>
-      {constructorState.bun && (
-        <div
-          className={cn(
-            styles.ingredientContainer,
-            styles.ingredientContainer_outter
-          )}
-          onClick={onBunClick}
-        >
-          <ConstructorElement
-            type="top"
-            isLocked={true}
-            text={`${constructorState.bun.name} (верх)`}
-            price={constructorState.bun.price}
-            thumbnail={constructorState.bun.image}
-          />
-        </div>
-      )}
+    <section
+      className={cn(styles.root, "ml-10", { [styles.root_over]: isHover })}
+      ref={dropTarget}
+    >
+      {bun && <Ingredient bun position="top" {...bun} />}
       <ul className={cn(styles.list, "custom-scroll")}>
-        {constructorState.mains.map((item, idx) => (
-          <li className={styles.item} key={`${item._id}-${idx}`}>
-            <Ingredient
-              {...item}
-              onDeleteClick={() => props.onDeleteClick(item._id)}
-              onClick={() => {
-                props.onIngredientClick(item._id);
-              }}
-            />
-          </li>
+        {mains.map((item) => (
+          <Ingredient {...item} key={item._id} />
         ))}
       </ul>
-      {constructorState.bun && (
-        <div
-          className={cn(
-            styles.ingredientContainer,
-            styles.ingredientContainer_outter
-          )}
-          onClick={onBunClick}
-        >
-          <ConstructorElement
-            type="bottom"
-            isLocked={true}
-            text={`${constructorState.bun.name} (низ)`}
-            price={constructorState.bun.price}
-            thumbnail={constructorState.bun.image}
-          />
-        </div>
-      )}
+      {bun && <Ingredient bun position="bottom" {...bun} />}
 
-      <div className={cn(styles.results, "mt-10")}>
-        <p className={cn(styles.totalCost, "mr-10")}>
-          <span className="text text_type_digits-medium mr-2">
-            {constructorState.price}
-          </span>
-          <CurrencyIcon type="primary" />
-        </p>
-        <Button type="primary" size="large" onClick={onOrderSubmit}>
-          {isLoading ? "Загрузка..." : "Оформить заказ"}
-        </Button>
+      <div style={{ marginTop: "auto" }}>
+        <div className={cn(styles.results, "mt-10")}>
+          <p className={cn(styles.totalCost, "mr-10")}>
+            <span className="text text_type_digits-medium mr-2">{price}</span>
+            <CurrencyIcon type="primary" />
+          </p>
+          <Button type="primary" size="large" onClick={onOrderSubmit}>
+            {orderLoading ? "Загрузка..." : "Оформить заказ"}
+          </Button>
+        </div>
       </div>
 
-      <Modal open={isPopupOpen} onClose={onClosePopup}>
+      <Modal open={isOrderPopupOpen} onClose={onClose}>
         <OrderDetails {...orderDetails} />
       </Modal>
     </section>

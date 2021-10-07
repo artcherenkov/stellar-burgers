@@ -15,17 +15,16 @@ interface IModal {
 }
 
 const Modal = (props: IModal) => {
-  const onEscKeydown = (evt: KeyboardEvent) => {
-    if (evt.key === "Escape") {
-      props.onClose();
-    }
-  };
-
   useEffect(() => {
+    const onEscKeydown = (evt: KeyboardEvent) => {
+      if (evt.key === "Escape") {
+        props.onClose();
+      }
+    };
     document.addEventListener("keydown", onEscKeydown);
 
     return () => document.removeEventListener("keydown", onEscKeydown);
-  }, [onEscKeydown]);
+  }, [props]);
 
   return ReactDOM.createPortal(
     <>
