@@ -1,30 +1,30 @@
-import cn from "classnames";
-import styles from "./app-header.module.css";
-
 import {
   BurgerIcon,
   ListIcon,
   Logo,
   ProfileIcon,
 } from "@ya.praktikum/react-developer-burger-ui-components";
+import cn from "classnames";
+import { Link } from "react-router-dom";
+import styles from "./app-header.module.css";
 
 const AppHeader = () => (
   <header className={cn(styles.root)}>
-    <a className={styles.logo} href="/">
+    <Link className={styles.logo} to="/">
       <Logo />
-    </a>
-    <a className={cn(styles.link, styles.link_active)} href="/">
+    </Link>
+    <Link className={cn(styles.link, styles.link_active)} to="/">
       <BurgerIcon type="primary" />
       <p className="text text_type_main-default ml-2">Конструктор</p>
-    </a>
-    <a className={styles.link} href="/">
+    </Link>
+    <Link className={styles.link} to="/feed">
       <ListIcon type="secondary" />
       <p className="text text_type_main-default ml-2">Лента заказов</p>
-    </a>
-    <a className={cn(styles.link, styles.link_right)} href="/">
+    </Link>
+    <Link className={cn(styles.link, styles.link_right)} to="/profile">
       <ProfileIcon type="secondary" />
       <p className="text text_type_main-default ml-2">Личный кабинет</p>
-    </a>
+    </Link>
   </header>
 );
 
