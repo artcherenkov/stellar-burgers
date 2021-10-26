@@ -1,0 +1,14 @@
+.root {
+  max-width: 320px;
+  margin-right: 60px;
+}
+
+.tabs {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.text {
+  margin-top: 80px;
+}
