@@ -1,7 +1,7 @@
 import cn from "classnames";
+import { TIngredient } from "../app/app.typed";
 import styles from "../modal/modal.module.css";
 import NutritionFacts from "./components/nutrition-facts/nutrition-facts";
-import { TIngredient } from "../app/app.typed";
 
 interface IIngredientDetails {
   ingredient: TIngredient;
@@ -9,8 +9,11 @@ interface IIngredientDetails {
 
 const IngredientDetails = ({ ingredient }: IIngredientDetails) => {
   return (
-    <>
-      <h1 className={cn("text text_type_main-large pt-3 pb-3")}>
+    <div>
+      <h1
+        style={{ textAlign: "center" }}
+        className={"text text_type_main-large pt-3 pb-3"}
+      >
         Детали ингредиента
       </h1>
       <img
@@ -22,7 +25,7 @@ const IngredientDetails = ({ ingredient }: IIngredientDetails) => {
         {ingredient.name}
       </h2>
       <NutritionFacts {...ingredient} />
-    </>
+    </div>
   );
 };
 
