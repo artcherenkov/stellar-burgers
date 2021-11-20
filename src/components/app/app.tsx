@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import {
   ForgotPassword,
@@ -10,8 +10,16 @@ import {
   Register,
   ResetPassword,
 } from "../../pages";
+import { useAppDispatch } from "../../services/hooks";
+import { refreshToken } from "../../services/slices/user";
 
 const App = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(refreshToken());
+  }, []);
+
   return (
     <BrowserRouter>
       <Switch>

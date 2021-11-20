@@ -1,11 +1,11 @@
-import ForgotPassword from "./ForgotPassword/ForgotPassword";
-import Ingredient from "./Ingredient/Ingredient";
-import Login from "./Login/Login";
-import Main from "./Main/Main";
-import NotFound from "./NotFound/NotFound";
-import Profile from "./Profile/Profile";
-import Register from "./Register/Register";
-import ResetPassword from "./ResetPassword/ResetPassword";
+import ForgotPassword from "./forgot-password/forgot-password";
+import Ingredient from "./ingredient/ingredient";
+import Login from "./login/login";
+import Main from "./main/main";
+import NotFound from "./not-found/not-found";
+import Profile from "./profile/profile";
+import Register from "./register/register";
+import ResetPassword from "./reset-password/reset-password";
 
 export {
   ForgotPassword,

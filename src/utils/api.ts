@@ -18,3 +18,40 @@ export const postOrder = (ingredients: { ingredients: string[] }) =>
       "Content-Type": "application/json",
     },
   }).then(getResponseData);
+
+export const register = (data: {
+  email: string;
+  password: string;
+  name: string;
+}) => {
+  return fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then(getResponseData);
+};
+
+export const login = (data: {
+  email: string;
+  password: string;
+}) => {
+  return fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then(getResponseData);
+};
+
+export const refreshToken = (refreshToken: string) => {
+  return fetch(`${API_URL}/auth/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token: refreshToken }),
+  }).then(getResponseData);
+};
