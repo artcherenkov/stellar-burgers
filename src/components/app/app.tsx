@@ -15,12 +15,14 @@ import {
   selectIsAuthenticated,
   getUser,
   refreshToken,
+  selectCanResetPassword,
 } from "../../services/slices/user";
 import ProtectedRoute from "../protected-route/protected-route";
 
 const App = () => {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const canResetPassword = useAppSelector(selectCanResetPassword);
 
   const handleLoad = useCallback(async () => {
     await dispatch(refreshToken());
@@ -62,7 +64,7 @@ const App = () => {
         <ProtectedRoute
           path="/reset-password"
           exact
-          isAllowed={!isAuthenticated}
+          isAllowed={canResetPassword}
           redirectionPath="/"
         >
           <ResetPassword />

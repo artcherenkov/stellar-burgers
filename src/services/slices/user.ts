@@ -16,6 +16,8 @@ interface IUserState {
 
   loading: boolean;
   error: boolean;
+
+  canResetPassword: boolean;
 }
 
 const initialState: IUserState = {
@@ -29,6 +31,10 @@ const initialState: IUserState = {
 
   loading: false,
   error: false,
+
+  // неавторизованный пользователя не может зайти на /reset-password,
+  // минуя /forgot-password
+  canResetPassword: false,
 };
 
 export const refreshToken = createAsyncThunk("user/refresh-token", () => {
@@ -111,7 +117,14 @@ export const patchUser = createAsyncThunk<TUser, TUser, { state: RootState }>(
 export const user = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    allowPasswordReset: (state) => {
+      state.canResetPassword = true;
+    },
+    restrictPasswordReset: (state) => {
+      state.canResetPassword = false;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(register.pending, (state) => {
       state.error = false;
@@ -199,7 +212,12 @@ export const selectIsAuthenticated = (state: RootState) => {
 export const selectUser = (state: RootState) => {
   return state.user.user;
 };
+export const selectCanResetPassword = (state: RootState) => {
+  return state.user.canResetPassword;
+};
 
-const { reducer } = user;
+const { actions, reducer } = user;
+
+export const { allowPasswordReset, restrictPasswordReset } = actions;
 
 export default reducer;

@@ -8,7 +8,7 @@ import Form, {
   Title,
 } from "../../components/form";
 import { useAppDispatch } from "../../services/hooks";
-import { forgotPassword } from "../../services/slices/user";
+import { forgotPassword, allowPasswordReset } from "../../services/slices/user";
 import { useHistory } from "react-router-dom";
 
 const ForgotPassword: React.FC = () => {
@@ -22,6 +22,7 @@ const ForgotPassword: React.FC = () => {
 
     const resultAction = await dispatch(forgotPassword(email));
     if (forgotPassword.fulfilled.match(resultAction)) {
+      dispatch(allowPasswordReset());
       history.replace("/reset-password");
     }
   };
