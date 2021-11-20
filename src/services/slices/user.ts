@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { postOrder } from "../../utils/api";
-import { RootState } from "../store";
 
 import * as api from "../../utils/api";
+import { RootState } from "../store";
 
 interface IUserState {
   accessToken: string;
+  isAuthenticated: boolean;
 
   user: {
     name: string;
@@ -18,6 +18,7 @@ interface IUserState {
 
 const initialState: IUserState = {
   accessToken: "",
+  isAuthenticated: false,
 
   user: {
     name: "",
@@ -82,11 +83,13 @@ export const user = createSlice({
       state.loading = false;
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user;
+      state.isAuthenticated = true;
     });
     builder.addCase(register.rejected, (state) => {
       state.loading = false;
       state.error = true;
     });
+
     builder.addCase(login.pending, (state) => {
       state.error = false;
       state.loading = true;
@@ -95,11 +98,13 @@ export const user = createSlice({
       state.loading = false;
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user;
+      state.isAuthenticated = true;
     });
     builder.addCase(login.rejected, (state) => {
       state.loading = false;
       state.error = true;
     });
+
     builder.addCase(refreshToken.pending, (state) => {
       state.error = false;
       state.loading = true;
@@ -107,6 +112,7 @@ export const user = createSlice({
     builder.addCase(refreshToken.fulfilled, (state, action) => {
       state.loading = false;
       state.accessToken = action.payload.accessToken;
+      state.isAuthenticated = true;
     });
     builder.addCase(refreshToken.rejected, (state) => {
       state.loading = false;
@@ -114,6 +120,10 @@ export const user = createSlice({
     });
   },
 });
+
+export const selectIsAuthenticated = (state: RootState) => {
+  return state.user.isAuthenticated;
+};
 
 const { reducer } = user;
 

@@ -10,11 +10,16 @@ import {
   Register,
   ResetPassword,
 } from "../../pages";
-import { useAppDispatch } from "../../services/hooks";
-import { refreshToken } from "../../services/slices/user";
+import { useAppDispatch, useAppSelector } from "../../services/hooks";
+import {
+  refreshToken,
+  selectIsAuthenticated,
+} from "../../services/slices/user";
+import ProtectedRoute from "../protected-route/protected-route";
 
 const App = () => {
   const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   useEffect(() => {
     dispatch(refreshToken());
@@ -23,27 +28,58 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/">
-          <Main />
-        </Route>
-        <Route exact path="/login">
+        <ProtectedRoute
+          path="/login"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
           <Login />
-        </Route>
-        <Route exact path="/register">
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/register"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
           <Register />
-        </Route>
-        <Route exact path="/forgot-password">
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/forgot-password"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
           <ForgotPassword />
-        </Route>
-        <Route exact path="/reset-password">
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/reset-password"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
           <ResetPassword />
-        </Route>
-        <Route exact path="/profile">
-          <Profile />
-        </Route>
+        </ProtectedRoute>
         <Route exact path="/ingredients/:id">
           <Ingredient />
         </Route>
+        <ProtectedRoute
+          path="/"
+          exact
+          redirectionPath="/login"
+          isAllowed={isAuthenticated}
+        >
+          <Main />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/profile"
+          exact
+          redirectionPath="/login"
+          isAllowed={isAuthenticated}
+        >
+          <Profile />
+        </ProtectedRoute>
+
         <Route>
           <NotFound />
         </Route>
