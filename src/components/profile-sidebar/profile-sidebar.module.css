@@ -12,3 +12,14 @@
 .text {
   margin-top: 80px;
 }
+
+.button {
+  border: none;
+  margin: 0;
+  background: transparent;
+}
+
+.button:hover {
+  color: white;
+  cursor: pointer;
+}

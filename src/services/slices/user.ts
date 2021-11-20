@@ -70,6 +70,19 @@ export const login = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk("user/logout", () => {
+  const refreshToken = localStorage.getItem("refresh-token");
+
+  if (!refreshToken) {
+    throw new Error("There is no refresh token in local storage");
+  }
+
+  return api.logout(refreshToken).then((data) => {
+    localStorage.removeItem("refresh-token");
+    return data;
+  });
+});
+
 export const user = createSlice({
   name: "user",
   initialState,
@@ -115,6 +128,16 @@ export const user = createSlice({
       state.isAuthenticated = true;
     });
     builder.addCase(refreshToken.rejected, (state) => {
+      state.loading = false;
+      state.error = true;
+    });
+
+    builder.addCase(logout.pending, (state) => {
+      state.error = false;
+      state.loading = true;
+    });
+    builder.addCase(logout.fulfilled, () => initialState);
+    builder.addCase(logout.rejected, (state) => {
       state.loading = false;
       state.error = true;
     });

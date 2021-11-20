@@ -6,20 +6,37 @@ import React from "react";
 import AppHeader from "../../components/app-header/app-header";
 import { Hint, InputContainer, Submit, Title } from "../../components/form";
 import Form from "../../components/form/form";
+import { useAppDispatch } from "../../services/hooks";
+import { useHistory } from "react-router-dom";
+import { login } from "../../services/slices/user";
 
 const Login: React.FC = () => {
-  const [value, setValue] = React.useState("");
+  const dispatch = useAppDispatch();
+  const history = useHistory();
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const handleSubmit = async (evt: React.SyntheticEvent) => {
+    evt.preventDefault();
+    const data = { email, password };
+
+    const resultAction = await dispatch(login(data));
+    if (login.fulfilled.match(resultAction)) {
+      history.replace("/");
+    }
+  };
 
   return (
     <>
       <AppHeader />
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Title>Вход</Title>
         <InputContainer>
           <Input
             name="email"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             type="text"
             placeholder="E-mail"
             error={false}
@@ -29,8 +46,8 @@ const Login: React.FC = () => {
         <InputContainer>
           <PasswordInput
             name="password"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </InputContainer>
         <Submit>Войти</Submit>
