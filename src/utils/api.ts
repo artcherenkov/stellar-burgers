@@ -62,3 +62,23 @@ export const logout = (refreshToken: string) => {
     body: JSON.stringify({ token: refreshToken }),
   }).then(getResponseData);
 };
+
+export const forgotPassword = (email: string) => {
+  return fetch(`${API_URL}/password-reset`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  }).then(getResponseData);
+};
+
+export const resetPassword = (data: { password: string; token: string }) => {
+  return fetch(`${API_URL}/password-reset/reset`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  }).then(getResponseData);
+};

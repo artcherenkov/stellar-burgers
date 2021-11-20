@@ -83,6 +83,13 @@ export const logout = createAsyncThunk("user/logout", () => {
   });
 });
 
+export const forgotPassword = createAsyncThunk(
+  "user/forgot-password",
+  (email: string) => {
+    return api.forgotPassword(email);
+  }
+);
+
 export const user = createSlice({
   name: "user",
   initialState,
