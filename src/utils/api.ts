@@ -82,3 +82,26 @@ export const resetPassword = (data: { password: string; token: string }) => {
     body: JSON.stringify(data),
   }).then(getResponseData);
 };
+
+export const getUser = (accessToken: string) => {
+  return fetch(`${API_URL}/auth/user`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  }).then(getResponseData);
+};
+
+export const patchUser = (
+  accessToken: string,
+  data: { name: string; email: string }
+) => {
+  return fetch(`${API_URL}/auth/user`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  }).then(getResponseData);
+};

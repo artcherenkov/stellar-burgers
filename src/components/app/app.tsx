@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import {
   ForgotPassword,
@@ -12,8 +12,9 @@ import {
 } from "../../pages";
 import { useAppDispatch, useAppSelector } from "../../services/hooks";
 import {
-  refreshToken,
   selectIsAuthenticated,
+  getUser,
+  refreshToken,
 } from "../../services/slices/user";
 import ProtectedRoute from "../protected-route/protected-route";
 
@@ -21,8 +22,14 @@ const App = () => {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
+  const handleLoad = useCallback(async () => {
+    await dispatch(refreshToken());
+
+    dispatch(getUser());
+  }, [dispatch]);
+
   useEffect(() => {
-    dispatch(refreshToken());
+    handleLoad();
   }, []);
 
   return (

@@ -3,14 +3,16 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as api from "../../utils/api";
 import { RootState } from "../store";
 
+type TUser = {
+  name: string;
+  email: string;
+};
+
 interface IUserState {
   accessToken: string;
   isAuthenticated: boolean;
 
-  user: {
-    name: string;
-    email: string;
-  };
+  user: TUser;
 
   loading: boolean;
   error: boolean;
@@ -39,7 +41,7 @@ export const refreshToken = createAsyncThunk("user/refresh-token", () => {
   return api.refreshToken(refreshToken).then((data) => {
     localStorage.setItem("refresh-token", data.refreshToken);
 
-    return data;
+    return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
   });
 });
 
@@ -51,7 +53,7 @@ export const register = createAsyncThunk(
       .then((data) => {
         localStorage.setItem("refresh-token", data.refreshToken);
 
-        return data;
+        return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
       })
       .catch((err) => {
         throw new Error("An error occurred");
@@ -65,7 +67,7 @@ export const login = createAsyncThunk(
     return api.login(data).then((data) => {
       localStorage.setItem("refresh-token", data.refreshToken);
 
-      return data;
+      return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
     });
   }
 );
@@ -87,6 +89,22 @@ export const forgotPassword = createAsyncThunk(
   "user/forgot-password",
   (email: string) => {
     return api.forgotPassword(email);
+  }
+);
+
+export const getUser = createAsyncThunk<TUser, void, { state: RootState }>(
+  "user/get-user",
+  (_, thunkAPI) => {
+    const { accessToken } = thunkAPI.getState().user;
+    return api.getUser(accessToken).then((data) => data.user);
+  }
+);
+
+export const patchUser = createAsyncThunk<TUser, TUser, { state: RootState }>(
+  "user/patch-user",
+  (data, thunkAPI) => {
+    const { accessToken } = thunkAPI.getState().user;
+    return api.patchUser(accessToken, data).then((data) => data.user);
   }
 );
 
@@ -148,11 +166,38 @@ export const user = createSlice({
       state.loading = false;
       state.error = true;
     });
+
+    builder.addCase(getUser.pending, (state) => {
+      state.error = false;
+      state.loading = true;
+    });
+    builder.addCase(getUser.fulfilled, (state, action) => {
+      state.user = action.payload;
+    });
+    builder.addCase(getUser.rejected, (state) => {
+      state.loading = false;
+      state.error = true;
+    });
+
+    builder.addCase(patchUser.pending, (state) => {
+      state.error = false;
+      state.loading = true;
+    });
+    builder.addCase(patchUser.fulfilled, (state, action) => {
+      state.user = action.payload;
+    });
+    builder.addCase(patchUser.rejected, (state) => {
+      state.loading = false;
+      state.error = true;
+    });
   },
 });
 
 export const selectIsAuthenticated = (state: RootState) => {
   return state.user.isAuthenticated;
+};
+export const selectUser = (state: RootState) => {
+  return state.user.user;
 };
 
 const { reducer } = user;

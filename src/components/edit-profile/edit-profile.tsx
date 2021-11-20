@@ -1,19 +1,33 @@
-import {Input} from "@ya.praktikum/react-developer-burger-ui-components";
-import {useState} from "react";
-import {InputContainer} from "../form";
+import {
+  Input,
+  Button,
+} from "@ya.praktikum/react-developer-burger-ui-components";
+import { useState } from "react";
+import { InputContainer } from "../form";
 
 import styles from "./edit-profile.module.css";
+import { useAppSelector, useAppDispatch } from "../../services/hooks";
+import { selectUser, patchUser } from "../../services/slices/user";
 
 const EditProfile = () => {
-  const [value, setValue] = useState("");
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+
+  const handleSubmit = () => {
+    dispatch(patchUser({ name, email }));
+  };
+
   return (
-    <form className={styles.form} action="">
+    <div className={styles.form}>
       <InputContainer>
         <Input
           name="name"
           type="text"
-          value={value}
-          onChange={(evt) => setValue(evt.target.value)}
+          value={name}
+          onChange={(evt) => setName(evt.target.value)}
           icon="EditIcon"
           placeholder="Имя"
         />
@@ -23,8 +37,8 @@ const EditProfile = () => {
         <Input
           name="login"
           type="text"
-          value={value}
-          onChange={(evt) => setValue(evt.target.value)}
+          value={email}
+          onChange={(evt) => setEmail(evt.target.value)}
           icon="EditIcon"
           placeholder="Логин"
         />
@@ -34,13 +48,16 @@ const EditProfile = () => {
         <Input
           name="password"
           type="password"
-          value={value}
-          onChange={(evt) => setValue(evt.target.value)}
+          value="password"
+          onChange={() => {}}
           icon="EditIcon"
           placeholder="Пароль"
+          disabled
         />
       </InputContainer>
-    </form>
+
+      <Button onClick={handleSubmit}>Сохранить</Button>
+    </div>
   );
 };
 
