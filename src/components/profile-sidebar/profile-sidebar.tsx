@@ -1,9 +1,12 @@
-import styles from "./profile-sidebar.module.css";
 import cn from "classnames";
+import styles from "./profile-sidebar.module.css";
+
 import { useAppDispatch } from "../../services/hooks";
 import { logout } from "../../services/slices/user";
+import { Link, useHistory } from "react-router-dom";
 
 const ProfileSidebar = () => {
+  const history = useHistory();
   const dispatch = useAppDispatch();
 
   const handleLogoutClick = () => dispatch(logout());
@@ -12,12 +15,25 @@ const ProfileSidebar = () => {
     <aside className={styles.root}>
       <ul className={styles.tabs}>
         <li>
-          <p className="text text_type_main-medium pt-4 pb-4">Профиль</p>
+          <Link
+            className={cn("text text_type_main-medium pt-4 pb-4", styles.link, {
+              [styles.link_active]: history.location.pathname === "/profile",
+            })}
+            to="/profile"
+          >
+            Профиль
+          </Link>
         </li>
         <li>
-          <p className="text text_type_main-medium text_color_inactive pt-4 pb-4">
+          <Link
+            className={cn(styles.link, "text text_type_main-medium pt-4 pb-4", {
+              [styles.link_active]:
+                history.location.pathname === "/profile/orders",
+            })}
+            to="/profile/orders"
+          >
             История заказов
-          </p>
+          </Link>
         </li>
         <li>
           <button

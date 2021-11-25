@@ -13,6 +13,16 @@
   margin-top: 80px;
 }
 
+.link {
+  display: block;
+  composes: text_color_inactive from global;
+  text-decoration: none;
+}
+
+.link_active {
+  color: white;
+}
+
 .button {
   border: none;
   margin: 0;

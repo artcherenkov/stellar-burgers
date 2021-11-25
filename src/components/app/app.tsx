@@ -18,6 +18,7 @@ import {
   selectCanResetPassword,
 } from "../../services/slices/user";
 import ProtectedRoute from "../protected-route/protected-route";
+import OrdersFeed from "../../pages/orders-feed/orders-feed";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -82,6 +83,14 @@ const App = () => {
           isAllowed={isAuthenticated}
         >
           <Profile />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/profile/orders"
+          exact
+          redirectionPath="/login"
+          isAllowed={isAuthenticated}
+        >
+          <OrdersFeed />
         </ProtectedRoute>
 
         <Route>
