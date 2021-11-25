@@ -2,7 +2,7 @@ import {
   Input,
   Button,
 } from "@ya.praktikum/react-developer-burger-ui-components";
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { InputContainer } from "../form";
 
 import styles from "./edit-profile.module.css";
@@ -16,7 +16,13 @@ const EditProfile = () => {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
 
-  const handleSubmit = () => {
+  const shouldShowButtons = useMemo(
+    () => name !== user.name || email !== user.email,
+    [user, name, email]
+  );
+
+  const handleSubmit = (evt: React.SyntheticEvent) => {
+    evt.preventDefault();
     dispatch(patchUser({ name, email }));
   };
 
@@ -26,7 +32,7 @@ const EditProfile = () => {
   };
 
   return (
-    <div className={styles.form}>
+    <form onSubmit={handleSubmit} className={styles.form}>
       <InputContainer>
         <Input
           name="name"
@@ -61,13 +67,15 @@ const EditProfile = () => {
         />
       </InputContainer>
 
-      <div className={styles.buttons}>
-        <Button type="secondary" size="medium" onClick={handleReset}>
-          Отмена
-        </Button>
-        <Button onClick={handleSubmit}>Сохранить</Button>
-      </div>
-    </div>
+      {shouldShowButtons && (
+        <div className={styles.buttons}>
+          <Button type="secondary" size="medium" onClick={handleReset}>
+            Отмена
+          </Button>
+          <Button>Сохранить</Button>
+        </div>
+      )}
+    </form>
   );
 };
 
