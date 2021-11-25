@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import * as api from "../../utils/api";
-import { RootState } from "../store";
+import { RootState, AppDispatch } from "../store";
 
 type TUser = {
   name: string;
@@ -98,19 +98,42 @@ export const forgotPassword = createAsyncThunk(
   }
 );
 
-export const getUser = createAsyncThunk<TUser, void, { state: RootState }>(
-  "user/get-user",
-  (_, thunkAPI) => {
-    const { accessToken } = thunkAPI.getState().user;
-    return api.getUser(accessToken).then((data) => data.user);
-  }
-);
+export const getUser = createAsyncThunk<
+  TUser,
+  void,
+  { state: RootState; dispatch: AppDispatch }
+>("user/get-user", (_, thunkAPI) => {
+  const { accessToken } = thunkAPI.getState().user;
+  return api
+    .getUser(accessToken)
+    .then((data) => data.user)
+    .catch(async (err) => {
+      if (err.message === "jwt expired" || err.message === "wtf") {
+        const resultAction = await thunkAPI.dispatch(refreshToken());
+        if (refreshToken.fulfilled.match(resultAction)) {
+          thunkAPI.dispatch(getUser());
+        }
+      }
+      thunkAPI.rejectWithValue("error");
+    });
+});
 
 export const patchUser = createAsyncThunk<TUser, TUser, { state: RootState }>(
   "user/patch-user",
   (data, thunkAPI) => {
     const { accessToken } = thunkAPI.getState().user;
-    return api.patchUser(accessToken, data).then((data) => data.user);
+    return api
+      .patchUser(accessToken, data)
+      .then((data) => data.user)
+      .catch(async (err) => {
+        if (err.message === "jwt expired" || err.message === "wtf") {
+          const resultAction = await thunkAPI.dispatch(refreshToken());
+          if (refreshToken.fulfilled.match(resultAction)) {
+            thunkAPI.dispatch(getUser());
+          }
+        }
+        thunkAPI.rejectWithValue("error");
+      });
   }
 );
 

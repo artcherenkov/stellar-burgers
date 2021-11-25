@@ -1,9 +1,15 @@
 const API_URL = "https://norma.nomoreparties.space/api";
 
-export const getResponseData = (res: Response) => {
+export const getResponseData = async (res: Response) => {
   if (res.ok) {
     return res.json();
   }
+
+  const data = await res.json();
+  if (data.message === "jwt expired") {
+    return Promise.reject(new Error("jwt expired"));
+  }
+
   return Promise.reject(new Error(`Ошибка: ${res.status}`));
 };
 
