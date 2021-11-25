@@ -23,7 +23,9 @@ const Login: React.FC = () => {
 
     const resultAction = await dispatch(login(data));
     if (login.fulfilled.match(resultAction)) {
-      history.replace("/");
+      const path = localStorage.getItem("initial-path") || "/";
+      localStorage.removeItem("initial-path");
+      history.replace(path);
     }
   };
 

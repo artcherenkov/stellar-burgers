@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 import {
   ForgotPassword,
   Ingredient,
@@ -22,6 +22,8 @@ import OrdersFeed from "../../pages/orders-feed/orders-feed";
 
 const App = () => {
   const dispatch = useAppDispatch();
+  const history = useHistory<{ prevPath?: string }>();
+
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const canResetPassword = useAppSelector(selectCanResetPassword);
 
@@ -32,72 +34,75 @@ const App = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    localStorage.setItem(
+      "initial-path",
+      history.location.state?.prevPath || "/"
+    );
+
     handleLoad();
   }, []);
 
   return (
-    <BrowserRouter>
-      <Switch>
-        <ProtectedRoute
-          path="/login"
-          exact
-          isAllowed={!isAuthenticated}
-          redirectionPath="/"
-        >
-          <Login />
-        </ProtectedRoute>
-        <ProtectedRoute
-          path="/register"
-          exact
-          isAllowed={!isAuthenticated}
-          redirectionPath="/"
-        >
-          <Register />
-        </ProtectedRoute>
-        <ProtectedRoute
-          path="/forgot-password"
-          exact
-          isAllowed={!isAuthenticated}
-          redirectionPath="/"
-        >
-          <ForgotPassword />
-        </ProtectedRoute>
-        <ProtectedRoute
-          path="/reset-password"
-          exact
-          isAllowed={canResetPassword}
-          redirectionPath="/"
-        >
-          <ResetPassword />
-        </ProtectedRoute>
-        <Route exact path="/ingredients/:id">
-          <Ingredient />
-        </Route>
-        <Route exact path="/">
-          <Main />
-        </Route>
-        <ProtectedRoute
-          path="/profile"
-          exact
-          redirectionPath="/login"
-          isAllowed={isAuthenticated}
-        >
-          <Profile />
-        </ProtectedRoute>
-        <ProtectedRoute
-          path="/profile/orders"
-          exact
-          redirectionPath="/login"
-          isAllowed={isAuthenticated}
-        >
-          <OrdersFeed />
-        </ProtectedRoute>
+    <Switch>
+      <ProtectedRoute
+        path="/login"
+        exact
+        isAllowed={!isAuthenticated}
+        redirectionPath="/"
+      >
+        <Login />
+      </ProtectedRoute>
+      <ProtectedRoute
+        path="/register"
+        exact
+        isAllowed={!isAuthenticated}
+        redirectionPath="/"
+      >
+        <Register />
+      </ProtectedRoute>
+      <ProtectedRoute
+        path="/forgot-password"
+        exact
+        isAllowed={!isAuthenticated}
+        redirectionPath="/"
+      >
+        <ForgotPassword />
+      </ProtectedRoute>
+      <ProtectedRoute
+        path="/reset-password"
+        exact
+        isAllowed={canResetPassword}
+        redirectionPath="/"
+      >
+        <ResetPassword />
+      </ProtectedRoute>
+      <Route exact path="/ingredients/:id">
+        <Ingredient />
+      </Route>
+      <Route exact path="/">
+        <Main />
+      </Route>
+      <ProtectedRoute
+        path="/profile"
+        exact
+        redirectionPath="/login"
+        isAllowed={isAuthenticated}
+      >
+        <Profile />
+      </ProtectedRoute>
+      <ProtectedRoute
+        path="/profile/orders"
+        exact
+        redirectionPath="/login"
+        isAllowed={isAuthenticated}
+      >
+        <OrdersFeed />
+      </ProtectedRoute>
 
-        <Route>
-          <NotFound />
-        </Route>
-      </Switch>
-    </BrowserRouter>
+      <Route>
+        <NotFound />
+      </Route>
+    </Switch>
   );
 };
 
