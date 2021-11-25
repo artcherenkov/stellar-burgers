@@ -72,14 +72,9 @@ const App = () => {
         <Route exact path="/ingredients/:id">
           <Ingredient />
         </Route>
-        <ProtectedRoute
-          path="/"
-          exact
-          redirectionPath="/login"
-          isAllowed={isAuthenticated}
-        >
+        <Route exact path="/">
           <Main />
-        </ProtectedRoute>
+        </Route>
         <ProtectedRoute
           path="/profile"
           exact
