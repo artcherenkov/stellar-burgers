@@ -20,6 +20,11 @@ const EditProfile = () => {
     dispatch(patchUser({ name, email }));
   };
 
+  const handleReset = () => {
+    setName(user.name);
+    setEmail(user.email);
+  };
+
   return (
     <div className={styles.form}>
       <InputContainer>
@@ -56,7 +61,12 @@ const EditProfile = () => {
         />
       </InputContainer>
 
-      <Button onClick={handleSubmit}>Сохранить</Button>
+      <div className={styles.buttons}>
+        <Button type="secondary" size="medium" onClick={handleReset}>
+          Отмена
+        </Button>
+        <Button onClick={handleSubmit}>Сохранить</Button>
+      </div>
     </div>
   );
 };
