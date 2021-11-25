@@ -67,8 +67,10 @@ export const ingredients = createSlice({
   initialState,
   reducers: {
     // взаимодействие с попапом ингредиента
-    openDetailsPopup: (state, action: PayloadAction<string>) => {
+    openDetailsPopup: (state) => {
       state.isDetailsPopupOpen = true;
+    },
+    setActiveIngredient: (state, action: PayloadAction<string>) => {
       state.activeIngredientId = action.payload;
     },
     resetActiveIngredient: (state) => {
@@ -221,6 +223,9 @@ export const selectIngredientQty = (id: string) => (state: RootState) => {
   const main = state.ingredients.constructor.mains.find((i) => i.id === id);
   return main ? main.qty : 0;
 };
+export const selectIngredientsLoading = (state: RootState) => {
+  return state.ingredients.ingredientsLoading;
+};
 
 const { actions, reducer } = ingredients;
 
@@ -232,6 +237,7 @@ export const {
   deleteIngredient,
   setDragging,
   swapIngredients,
+  setActiveIngredient,
 } = actions;
 
 export default reducer;

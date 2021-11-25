@@ -9,6 +9,7 @@ import {
   openDetailsPopup,
   setDragging,
   swapIngredients,
+  setActiveIngredient,
 } from "../../../../services/slices/ingredients";
 import { useAppDispatch } from "../../../../services/hooks";
 import { useOnIngredientClick } from "./ingredient.utils";
@@ -25,7 +26,10 @@ const Ingredient = (props: IIngredient) => {
   const dispatch = useAppDispatch();
 
   const onDeleteClick = () => dispatch(deleteIngredient(props._id));
-  const onIngredientClick = () => dispatch(openDetailsPopup(props._id));
+  const onIngredientClick = () => {
+    dispatch(setActiveIngredient(props._id));
+    dispatch(openDetailsPopup());
+  };
   const { containerRef, onClick } = useOnIngredientClick(onIngredientClick);
 
   const [{ opacity, isDragging }, ref] = useDrag({
