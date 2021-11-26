@@ -3,7 +3,6 @@ import {
   PasswordInput,
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import React from "react";
-import AppHeader from "../../components/app-header/app-header";
 import Form, {
   Hint,
   InputContainer,
@@ -13,6 +12,7 @@ import Form, {
 import { useAppDispatch } from "../../services/hooks";
 import { register } from "../../services/slices/user";
 import { useHistory } from "react-router-dom";
+import Layout from "../../components/layout/layout";
 
 const Register: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -33,8 +33,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <Form onSubmit={handleSubmit}>
         <Title>Регистрация</Title>
         <InputContainer>
@@ -71,7 +70,7 @@ const Register: React.FC = () => {
           Уже зарегистрированы?
         </Hint>
       </Form>
-    </>
+    </Layout>
   );
 };
 

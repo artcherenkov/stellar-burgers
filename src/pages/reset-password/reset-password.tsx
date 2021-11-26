@@ -3,20 +3,19 @@ import {
   PasswordInput,
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import React from "react";
-import AppHeader from "../../components/app-header/app-header";
 import Form, {
   Hint,
   InputContainer,
   Submit,
   Title,
 } from "../../components/form";
+import Layout from "../../components/layout/layout";
 
 const ResetPassword: React.FC = () => {
   const [value, setValue] = React.useState("");
 
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <Form>
         <Title>Восстановление пароля</Title>
         <InputContainer>
@@ -42,7 +41,7 @@ const ResetPassword: React.FC = () => {
           Вспомнили пароль?
         </Hint>
       </Form>
-    </>
+    </Layout>
   );
 };
 

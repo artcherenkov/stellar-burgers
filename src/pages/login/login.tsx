@@ -3,12 +3,11 @@ import {
   PasswordInput,
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import React from "react";
-import AppHeader from "../../components/app-header/app-header";
 import { Hint, InputContainer, Submit, Title } from "../../components/form";
 import Form from "../../components/form/form";
 import { useAppDispatch } from "../../services/hooks";
-import { useHistory } from "react-router-dom";
 import { login } from "../../services/slices/user";
+import Layout from "../../components/layout/layout";
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,8 +22,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <Form onSubmit={handleSubmit}>
         <Title>Вход</Title>
         <InputContainer>
@@ -53,7 +51,7 @@ const Login: React.FC = () => {
           Забыли пароль?
         </Hint>
       </Form>
-    </>
+    </Layout>
   );
 };
 

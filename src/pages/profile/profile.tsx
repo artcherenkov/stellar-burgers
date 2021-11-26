@@ -1,7 +1,7 @@
 import React from "react";
-import AppHeader from "../../components/app-header/app-header";
 import EditProfile from "../../components/edit-profile/edit-profile";
 import ProfileSidebar from "../../components/profile-sidebar/profile-sidebar";
+import Layout from "../../components/layout/layout";
 
 const CONTAINER_STYLE = {
   maxWidth: 1280,
@@ -12,13 +12,12 @@ const CONTAINER_STYLE = {
 
 const Profile: React.FC = () => {
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <div style={CONTAINER_STYLE}>
         <ProfileSidebar />
         <EditProfile />
       </div>
-    </>
+    </Layout>
   );
 };
 

@@ -1,11 +1,10 @@
-import AppHeader from "../../components/app-header/app-header";
+import Layout from "../../components/layout/layout";
 
 const OrdersFeed = () => {
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <div />
-    </>
+    </Layout>
   );
 };
 

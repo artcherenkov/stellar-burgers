@@ -1,6 +1,5 @@
 import { Input } from "@ya.praktikum/react-developer-burger-ui-components";
 import React from "react";
-import AppHeader from "../../components/app-header/app-header";
 import Form, {
   Hint,
   InputContainer,
@@ -10,6 +9,7 @@ import Form, {
 import { useAppDispatch } from "../../services/hooks";
 import { forgotPassword, allowPasswordReset } from "../../services/slices/user";
 import { useHistory } from "react-router-dom";
+import Layout from "../../components/layout/layout";
 
 const ForgotPassword: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -28,8 +28,7 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <>
-      <AppHeader />
+    <Layout>
       <Form onSubmit={handleSubmit}>
         <Title>Восстановление пароля</Title>
         <InputContainer>
@@ -48,7 +47,7 @@ const ForgotPassword: React.FC = () => {
           Вспомнили пароль?
         </Hint>
       </Form>
-    </>
+    </Layout>
   );
 };
 
