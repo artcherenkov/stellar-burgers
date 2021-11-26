@@ -11,19 +11,19 @@ const ProtectedRoute = ({
   redirectionPath,
   ...routeProps
 }: ProtectedRouteProps) => {
-  const history = useHistory();
+  const history = useHistory<{ from?: string }>();
 
   if (isAllowed) {
     return <Route {...routeProps} />;
   }
 
-  const { pathname, search } = history.location;
+  const dynamicRedirectionPath = history.location.state?.from;
 
   return (
     <Redirect
       to={{
-        pathname: redirectionPath,
-        state: { prevPath: pathname + search },
+        pathname: dynamicRedirectionPath || redirectionPath,
+        state: { from: history.location.pathname },
       }}
     />
   );

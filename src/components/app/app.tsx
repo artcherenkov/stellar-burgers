@@ -22,25 +22,17 @@ import OrdersFeed from "../../pages/orders-feed/orders-feed";
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory<{ prevPath?: string }>();
-
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const canResetPassword = useAppSelector(selectCanResetPassword);
 
   const handleLoad = useCallback(async () => {
     await dispatch(refreshToken());
-
     dispatch(getUser());
   }, [dispatch]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "initial-path",
-      history.location.state?.prevPath || "/"
-    );
-
     handleLoad();
-  }, []);
+  }, [handleLoad]);
 
   return (
     <Switch>

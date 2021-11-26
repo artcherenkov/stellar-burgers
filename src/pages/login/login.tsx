@@ -12,7 +12,6 @@ import { login } from "../../services/slices/user";
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
-  const history = useHistory();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -20,13 +19,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (evt: React.SyntheticEvent) => {
     evt.preventDefault();
     const data = { email, password };
-
-    const resultAction = await dispatch(login(data));
-    if (login.fulfilled.match(resultAction)) {
-      const path = localStorage.getItem("initial-path") || "/";
-      localStorage.removeItem("initial-path");
-      history.replace(path);
-    }
+    dispatch(login(data));
   };
 
   return (
