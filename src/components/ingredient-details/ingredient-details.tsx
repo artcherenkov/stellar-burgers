@@ -1,13 +1,19 @@
 import cn from "classnames";
-import { TIngredient } from "../app/app.typed";
 import styles from "../modal/modal.module.css";
 import NutritionFacts from "./components/nutrition-facts/nutrition-facts";
+import { useParams } from "react-router-dom";
+import { useAppSelector } from "../../services/hooks";
+import { selectIngredientById } from "../../services/slices/ingredients";
 
-interface IIngredientDetails {
-  ingredient: TIngredient;
-}
+const IngredientDetails = () => {
+  const params = useParams<{ id: string }>();
 
-const IngredientDetails = ({ ingredient }: IIngredientDetails) => {
+  const ingredient = useAppSelector(selectIngredientById(params.id));
+
+  if (!ingredient) {
+    return <div>Ingredient not found</div>;
+  }
+
   return (
     <div>
       <h1

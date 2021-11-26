@@ -226,6 +226,9 @@ export const selectIngredientQty = (id: string) => (state: RootState) => {
 export const selectIngredientsLoading = (state: RootState) => {
   return state.ingredients.ingredientsLoading;
 };
+export const selectIngredientById = (id: string) => (state: RootState) => {
+  return state.ingredients.ingredients.find((ing) => ing._id === id);
+};
 
 const { actions, reducer } = ingredients;
 

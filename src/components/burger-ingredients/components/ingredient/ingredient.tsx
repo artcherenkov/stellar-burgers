@@ -5,16 +5,16 @@ import {
 } from "@ya.praktikum/react-developer-burger-ui-components";
 import cn from "classnames";
 import { TIngredient } from "../../../app/app.typed";
-import {
-  openDetailsPopup,
-  selectIngredientQty, selectIngredients,
-} from "../../../../services/slices/ingredients";
-import { useAppDispatch, useAppSelector } from "../../../../services/hooks";
+import { selectIngredientQty } from "../../../../services/slices/ingredients";
+import { useAppSelector } from "../../../../services/hooks";
 import { useDrag } from "react-dnd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { selectIsAuthenticated } from "../../../../services/slices/user";
 
-const Ingredient = (props: TIngredient) => {
-  const dispatch = useAppDispatch();
+interface IIngredient extends TIngredient {}
+
+const Ingredient = (props: IIngredient) => {
+  const location = useLocation();
   const ingredientCount = useAppSelector(selectIngredientQty(props._id));
 
   const [, ref] = useDrag({
@@ -22,12 +22,15 @@ const Ingredient = (props: TIngredient) => {
     item: { id: props._id },
   });
 
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
   return (
     <Link
+      key={props._id}
       className={styles.link}
       to={{
         pathname: `/ingredients/${props._id}`,
-        state: { showPopup: true },
+        state: { background: isAuthenticated ? location : undefined },
       }}
     >
       <div className={styles.burgerIngredient} ref={ref}>
