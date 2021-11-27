@@ -9,7 +9,6 @@ import { selectIngredientQty } from "../../../../services/slices/ingredients";
 import { useAppSelector } from "../../../../services/hooks";
 import { useDrag } from "react-dnd";
 import { Link, useLocation } from "react-router-dom";
-import { selectIsAuthenticated } from "../../../../services/slices/user";
 
 interface IIngredient extends TIngredient {}
 
@@ -22,15 +21,13 @@ const Ingredient = (props: IIngredient) => {
     item: { id: props._id },
   });
 
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-
   return (
     <Link
       key={props._id}
       className={styles.link}
       to={{
         pathname: `/ingredients/${props._id}`,
-        state: { background: isAuthenticated ? location : undefined },
+        state: { background: location },
       }}
     >
       <div className={styles.burgerIngredient} ref={ref}>
