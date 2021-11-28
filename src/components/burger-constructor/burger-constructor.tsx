@@ -25,8 +25,11 @@ import {
   selectOrderLoading,
 } from "../../services/slices/order";
 import { useDrop } from "react-dnd";
+import { selectIsAuthenticated } from "../../services/slices/user";
+import { useHistory } from "react-router-dom";
 
 const BurgerConstructor = () => {
+  const history = useHistory();
   const dispatch = useAppDispatch();
 
   const bun = useAppSelector(selectBun);
@@ -35,6 +38,7 @@ const BurgerConstructor = () => {
   const orderDetails = useAppSelector(selectOrderDetails);
   const orderLoading = useAppSelector(selectOrderLoading);
   const isOrderPopupOpen = useAppSelector(selectIsOrderPopupOpen);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const [{ isHover }, dropTarget] = useDrop({
     accept: "ingredient-from-menu",
@@ -48,6 +52,11 @@ const BurgerConstructor = () => {
 
   const onOrderSubmit = () => {
     if (!bun || orderLoading) return;
+
+    if (!isAuthenticated) {
+      return history.push("/login");
+    }
+
     const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
     dispatch(fetchOrder(ingredientsIds)).then(() => dispatch(openOrderPopup()));
   };

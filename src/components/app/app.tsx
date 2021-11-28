@@ -1,54 +1,121 @@
-import React, { useEffect } from "react";
-
-import AppHeader from "../app-header/app-header";
-import BurgerIngredients from "../burger-ingredients/burger-ingredients";
-import BurgerConstructor from "../burger-constructor/burger-constructor";
-import Modal from "../modal/modal";
-import IngredientDetails from "../ingredient-details/ingredient-details";
-import styles from "./app.module.css";
-
+import React, { useEffect, useCallback } from "react";
+import { Route, Switch, useHistory, useLocation } from "react-router-dom";
+import {
+  ForgotPassword,
+  Ingredient,
+  Login,
+  Main,
+  NotFound,
+  Profile,
+  Register,
+  ResetPassword,
+} from "../../pages";
 import { useAppDispatch, useAppSelector } from "../../services/hooks";
 import {
-  closeDetailsPopup,
-  fetchIngredients,
-  resetActiveIngredient,
-  selectActiveIngredient,
-  selectIsDetailsPopupOpen,
-} from "../../services/slices/ingredients";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-
-export const ANIMATION_DURATION = 300; // мс
+  selectIsAuthenticated,
+  getUser,
+  refreshToken,
+  selectCanResetPassword,
+} from "../../services/slices/user";
+import ProtectedRoute from "../protected-route/protected-route";
+import OrdersFeed from "../../pages/orders-feed/orders-feed";
+import IngredientDetails from "../ingredient-details/ingredient-details";
+import Modal from "../modal/modal";
+import * as H from "history";
 
 const App = () => {
+  const history = useHistory();
+  const location = useLocation<{ background?: H.Location }>();
   const dispatch = useAppDispatch();
-  const activeIngredient = useAppSelector(selectActiveIngredient);
-  const isDetailsPopupOpen = useAppSelector(selectIsDetailsPopupOpen);
 
-  useEffect(() => {
-    dispatch(fetchIngredients());
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const canResetPassword = useAppSelector(selectCanResetPassword);
+
+  let background = location.state && location.state.background;
+
+  const handleLoad = useCallback(async () => {
+    await dispatch(refreshToken());
+    dispatch(getUser());
   }, [dispatch]);
 
+  useEffect(() => {
+    handleLoad();
+  }, [handleLoad]);
+
   const onModalClose = () => {
-    dispatch(closeDetailsPopup());
-    setTimeout(() => dispatch(resetActiveIngredient()), ANIMATION_DURATION);
+    history.push("/");
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className={styles.root}>
-        <AppHeader />
-        <div className={styles.burgerContainer}>
-          <BurgerIngredients />
-          <BurgerConstructor />
-          <Modal open={isDetailsPopupOpen} onClose={onModalClose}>
-            {activeIngredient && (
-              <IngredientDetails ingredient={activeIngredient} />
-            )}
+    <div>
+      <Switch location={background || location}>
+        <ProtectedRoute
+          path="/login"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
+          <Login />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/register"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
+          <Register />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/forgot-password"
+          exact
+          isAllowed={!isAuthenticated}
+          redirectionPath="/"
+        >
+          <ForgotPassword />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/reset-password"
+          exact
+          isAllowed={canResetPassword}
+          redirectionPath="/"
+        >
+          <ResetPassword />
+        </ProtectedRoute>
+        <Route exact path="/">
+          <Main />
+        </Route>
+        <Route path="/ingredients/:id">
+          <Ingredient />
+        </Route>
+        <ProtectedRoute
+          path="/profile"
+          exact
+          redirectionPath="/login"
+          isAllowed={isAuthenticated}
+        >
+          <Profile />
+        </ProtectedRoute>
+        <ProtectedRoute
+          path="/profile/orders"
+          exact
+          redirectionPath="/login"
+          isAllowed={isAuthenticated}
+        >
+          <OrdersFeed />
+        </ProtectedRoute>
+
+        <Route>
+          <NotFound />
+        </Route>
+      </Switch>
+      {background && (
+        <Route path="/ingredients/:id">
+          <Modal open={true} onClose={onModalClose}>
+            <IngredientDetails />
           </Modal>
-        </div>
-      </div>
-    </DndProvider>
+        </Route>
+      )}
+    </div>
   );
 };
 

@@ -1,16 +1,25 @@
 import cn from "classnames";
 import styles from "../modal/modal.module.css";
 import NutritionFacts from "./components/nutrition-facts/nutrition-facts";
-import { TIngredient } from "../app/app.typed";
+import { useParams } from "react-router-dom";
+import { useAppSelector } from "../../services/hooks";
+import { selectIngredientById } from "../../services/slices/ingredients";
 
-interface IIngredientDetails {
-  ingredient: TIngredient;
-}
+const IngredientDetails = () => {
+  const params = useParams<{ id: string }>();
 
-const IngredientDetails = ({ ingredient }: IIngredientDetails) => {
+  const ingredient = useAppSelector(selectIngredientById(params.id));
+
+  if (!ingredient) {
+    return <div>Ingredient not found</div>;
+  }
+
   return (
-    <>
-      <h1 className={cn("text text_type_main-large pt-3 pb-3")}>
+    <div>
+      <h1
+        style={{ textAlign: "center" }}
+        className={"text text_type_main-large pt-3 pb-3"}
+      >
         Детали ингредиента
       </h1>
       <img
@@ -22,7 +31,7 @@ const IngredientDetails = ({ ingredient }: IIngredientDetails) => {
         {ingredient.name}
       </h2>
       <NutritionFacts {...ingredient} />
-    </>
+    </div>
   );
 };
 

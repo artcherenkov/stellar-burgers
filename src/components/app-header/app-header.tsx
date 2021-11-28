@@ -1,31 +1,61 @@
-import cn from "classnames";
-import styles from "./app-header.module.css";
-
+import { useMemo } from "react";
 import {
   BurgerIcon,
   ListIcon,
   Logo,
   ProfileIcon,
 } from "@ya.praktikum/react-developer-burger-ui-components";
+import cn from "classnames";
+import { Link, useHistory } from "react-router-dom";
+import styles from "./app-header.module.css";
 
-const AppHeader = () => (
-  <header className={cn(styles.root)}>
-    <a className={styles.logo} href="/">
-      <Logo />
-    </a>
-    <a className={cn(styles.link, styles.link_active)} href="/">
-      <BurgerIcon type="primary" />
-      <p className="text text_type_main-default ml-2">Конструктор</p>
-    </a>
-    <a className={styles.link} href="/">
-      <ListIcon type="secondary" />
-      <p className="text text_type_main-default ml-2">Лента заказов</p>
-    </a>
-    <a className={cn(styles.link, styles.link_right)} href="/">
-      <ProfileIcon type="secondary" />
-      <p className="text text_type_main-default ml-2">Личный кабинет</p>
-    </a>
-  </header>
-);
+const AppHeader = () => {
+  const history = useHistory();
+
+  const pathname = useMemo(() => history.location.pathname, [history.location]);
+
+  return (
+    <header className={cn(styles.root)}>
+      <div className={styles.container}>
+        <div className={styles.linksContainer}>
+          <Link className={styles.logo} to="/">
+            <Logo />
+          </Link>
+          <Link
+            className={cn(styles.link, {
+              [styles.link_active]: pathname === "/",
+            })}
+            to="/"
+          >
+            <BurgerIcon type={pathname === "/" ? "primary" : "secondary"} />
+            <p className="text text_type_main-default ml-2">Конструктор</p>
+          </Link>
+          <Link
+            className={cn(styles.link, {
+              [styles.link_active]: pathname === "/profile/orders",
+            })}
+            to="/profile/orders"
+          >
+            <ListIcon
+              type={pathname === "/profile/orders" ? "primary" : "secondary"}
+            />
+            <p className="text text_type_main-default ml-2">Лента заказов</p>
+          </Link>
+          <Link
+            className={cn(styles.link, styles.link_right, {
+              [styles.link_active]: pathname === "/profile",
+            })}
+            to="/profile"
+          >
+            <ProfileIcon
+              type={pathname === "/profile" ? "primary" : "secondary"}
+            />
+            <p className="text text_type_main-default ml-2">Личный кабинет</p>
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+};
 
 export default AppHeader;

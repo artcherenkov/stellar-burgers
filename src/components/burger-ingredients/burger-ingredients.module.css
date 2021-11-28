@@ -24,6 +24,11 @@
   grid-gap: 32px 24px;
 }
 
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .burgerIngredient {
   display: flex;
   flex-direction: column;
