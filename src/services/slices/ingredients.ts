@@ -3,11 +3,6 @@ import { IngredientType, TIngredient } from "../../components/app/app.typed";
 import { getIngredients } from "../../utils/api";
 import { RootState } from "../store";
 
-/** Тип ответа сервера при запросе ингредиентов. */
-type TIngredientResponse = PayloadAction<{
-  data: TIngredient[];
-  success: boolean;
-}>;
 type TIdWithQty = { id: string; qty: number };
 
 interface IIngredientsState {
@@ -166,15 +161,11 @@ export const ingredients = createSlice({
     builder.addCase(fetchIngredients.pending, (state) => {
       state.ingredientsLoading = true;
     });
-    builder.addCase(
-      fetchIngredients.fulfilled,
-      (state, action: TIngredientResponse) => {
-        const { data } = action.payload;
-        state.ingredients = data;
-        state.ingredientsLoading = false;
-        state.ingredientsError = false;
-      }
-    );
+    builder.addCase(fetchIngredients.fulfilled, (state, action) => {
+      state.ingredients = action.payload.data;
+      state.ingredientsLoading = false;
+      state.ingredientsError = false;
+    });
     builder.addCase(fetchIngredients.rejected, (state) => {
       state.ingredientsError = true;
     });

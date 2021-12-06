@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import * as api from "../../utils/api";
 import { RootState, AppDispatch } from "../store";
+import { TAuthOutput, TRefreshTokenOutput } from "../../utils/api";
 
 type TUser = {
   name: string;
@@ -37,19 +38,22 @@ const initialState: IUserState = {
   canResetPassword: false,
 };
 
-export const refreshToken = createAsyncThunk("user/refresh-token", () => {
-  const refreshToken = localStorage.getItem("refresh-token");
+export const refreshToken = createAsyncThunk<TRefreshTokenOutput>(
+  "user/refresh-token",
+  () => {
+    const refreshToken = localStorage.getItem("refresh-token");
 
-  if (!refreshToken) {
-    throw new Error("There is no refresh token in local storage");
+    if (!refreshToken) {
+      throw new Error("There is no refresh token in local storage");
+    }
+
+    return api.refreshToken(refreshToken).then((data) => {
+      localStorage.setItem("refresh-token", data.refreshToken);
+
+      return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
+    });
   }
-
-  return api.refreshToken(refreshToken).then((data) => {
-    localStorage.setItem("refresh-token", data.refreshToken);
-
-    return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
-  });
-});
+);
 
 export const register = createAsyncThunk(
   "user/register",
@@ -61,22 +65,22 @@ export const register = createAsyncThunk(
 
         return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
       })
-      .catch((err) => {
+      .catch(() => {
         throw new Error("An error occurred");
       });
   }
 );
 
-export const login = createAsyncThunk(
-  "user/login",
-  (data: { email: string; password: string }) => {
-    return api.login(data).then((data) => {
-      localStorage.setItem("refresh-token", data.refreshToken);
+export const login = createAsyncThunk<
+  TAuthOutput,
+  { email: string; password: string }
+>("user/login", (data) => {
+  return api.login(data).then((data) => {
+    localStorage.setItem("refresh-token", data.refreshToken);
 
-      return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
-    });
-  }
-);
+    return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
+  });
+});
 
 export const logout = createAsyncThunk("user/logout", () => {
   const refreshToken = localStorage.getItem("refresh-token");
@@ -99,7 +103,7 @@ export const forgotPassword = createAsyncThunk(
 );
 
 export const getUser = createAsyncThunk<
-  TUser,
+  TUser | void,
   void,
   { state: RootState; dispatch: AppDispatch }
 >("user/get-user", (_, thunkAPI) => {
@@ -118,24 +122,25 @@ export const getUser = createAsyncThunk<
     });
 });
 
-export const patchUser = createAsyncThunk<TUser, TUser, { state: RootState }>(
-  "user/patch-user",
-  (data, thunkAPI) => {
-    const { accessToken } = thunkAPI.getState().user;
-    return api
-      .patchUser(accessToken, data)
-      .then((data) => data.user)
-      .catch(async (err) => {
-        if (err.message === "jwt expired" || err.message === "wtf") {
-          const resultAction = await thunkAPI.dispatch(refreshToken());
-          if (refreshToken.fulfilled.match(resultAction)) {
-            thunkAPI.dispatch(getUser());
-          }
+export const patchUser = createAsyncThunk<
+  TUser | void,
+  TUser,
+  { state: RootState }
+>("user/patch-user", (data, thunkAPI) => {
+  const { accessToken } = thunkAPI.getState().user;
+  return api
+    .patchUser(accessToken, data)
+    .then((data) => data.user)
+    .catch(async (err) => {
+      if (err.message === "jwt expired" || err.message === "wtf") {
+        const resultAction = await thunkAPI.dispatch(refreshToken());
+        if (refreshToken.fulfilled.match(resultAction)) {
+          thunkAPI.dispatch(getUser());
         }
-        thunkAPI.rejectWithValue("error");
-      });
-  }
-);
+      }
+      thunkAPI.rejectWithValue("error");
+    });
+});
 
 export const user = createSlice({
   name: "user",
@@ -170,8 +175,11 @@ export const user = createSlice({
     });
     builder.addCase(login.fulfilled, (state, action) => {
       state.loading = false;
-      state.accessToken = action.payload.accessToken;
-      state.user = action.payload.user;
+      if (action.payload) {
+        state.accessToken = action.payload.accessToken;
+        state.user = action.payload.user;
+      }
+
       state.isAuthenticated = true;
     });
     builder.addCase(login.rejected, (state) => {
@@ -208,7 +216,9 @@ export const user = createSlice({
       state.loading = true;
     });
     builder.addCase(getUser.fulfilled, (state, action) => {
-      state.user = action.payload;
+      if (action.payload) {
+        state.user = action.payload;
+      }
     });
     builder.addCase(getUser.rejected, (state) => {
       state.loading = false;
@@ -220,7 +230,9 @@ export const user = createSlice({
       state.loading = true;
     });
     builder.addCase(patchUser.fulfilled, (state, action) => {
-      state.user = action.payload;
+      if (action.payload) {
+        state.user = action.payload;
+      }
     });
     builder.addCase(patchUser.rejected, (state) => {
       state.loading = false;
