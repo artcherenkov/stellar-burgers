@@ -22,6 +22,7 @@ import OrdersFeed from "../../pages/orders-feed/orders-feed";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 import Modal from "../modal/modal";
 import * as H from "history";
+import OrderDetails from "../../pages/order-details/order-details";
 
 const App = () => {
   const history = useHistory();
@@ -105,6 +106,9 @@ const App = () => {
         </ProtectedRoute>
         <Route path="/feed" exact>
           <OrdersFeed />
+        </Route>
+        <Route path="/feed/:id" exact>
+          <OrderDetails />
         </Route>
         <Route>
           <NotFound />

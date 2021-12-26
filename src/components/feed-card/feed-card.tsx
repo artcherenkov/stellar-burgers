@@ -1,5 +1,6 @@
 import cn from "classnames";
 import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components";
+import IngredientImage from "./components/ingredient-image/ingredient-image";
 import styles from "./feed-card.module.css";
 
 const FeedCard = () => {
@@ -16,30 +17,10 @@ const FeedCard = () => {
       </h2>
       <div className={styles.priceInfo}>
         <ul className={styles.ingredientsList}>
-          <li className={cn(styles.ingredient)}>
-            <img
-              className={styles.ingredientImage}
-              src="https://code.s3.yandex.net/react/code/bun-02-mobile.png"
-              alt="ингредиент"
-            />
-            <span className={cn(styles.overlay, "text text_type_main-default")}>
-              +3
-            </span>
-          </li>
-          <li className={styles.ingredient}>
-            <img
-              className={styles.ingredientImage}
-              src="https://code.s3.yandex.net/react/code/bun-02-mobile.png"
-              alt="ингредиент"
-            />
-          </li>
-          <li className={styles.ingredient}>
-            <img
-              className={styles.ingredientImage}
-              src="https://code.s3.yandex.net/react/code/bun-02-mobile.png"
-              alt="ингредиент"
-            />
-          </li>
+          <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
+          <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
+          <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
+          <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
         </ul>
         <p className={cn(styles.priceContainer)}>
           <span className={cn(styles.price, "text text_type_digits-default")}>
