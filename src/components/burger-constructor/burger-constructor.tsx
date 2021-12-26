@@ -41,7 +41,7 @@ const BurgerConstructor = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const [{ isHover }, dropTarget] = useDrop({
-    accept: "ingredient-from-menu",
+    accept: "order-from-menu",
     collect: (monitor) => ({
       isHover: monitor.isOver(),
     }),

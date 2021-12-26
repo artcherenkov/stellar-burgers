@@ -3,7 +3,8 @@ import EditProfile from "../../components/edit-profile/edit-profile";
 import ProfileSidebar from "../../components/profile-sidebar/profile-sidebar";
 import Layout from "../../components/layout/layout";
 
-const CONTAINER_STYLE = {
+export const CONTAINER_STYLE = {
+  width: "100%",
   maxWidth: 1280,
   padding: "0 40px",
   display: "flex",

@@ -17,7 +17,7 @@ const Ingredient = (props: IIngredient) => {
   const ingredientCount = useAppSelector(selectIngredientQty(props._id));
 
   const [, ref] = useDrag({
-    type: "ingredient-from-menu",
+    type: "order-from-menu",
     item: { id: props._id },
   });
 

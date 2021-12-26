@@ -23,6 +23,7 @@ import IngredientDetails from "../ingredient-details/ingredient-details";
 import Modal from "../modal/modal";
 import * as H from "history";
 import OrderDetails from "../../pages/order-details/order-details";
+import OrdersList from "../../pages/orders-list/orders-list";
 
 const App = () => {
   const history = useHistory();
@@ -102,7 +103,7 @@ const App = () => {
           redirectionPath="/login"
           isAllowed={isAuthenticated}
         >
-          <OrdersFeed />
+          <OrdersList />
         </ProtectedRoute>
         <Route path="/feed" exact>
           <OrdersFeed />
