@@ -103,7 +103,9 @@ const App = () => {
         >
           <OrdersFeed />
         </ProtectedRoute>
-
+        <Route path="/feed" exact>
+          <OrdersFeed />
+        </Route>
         <Route>
           <NotFound />
         </Route>
