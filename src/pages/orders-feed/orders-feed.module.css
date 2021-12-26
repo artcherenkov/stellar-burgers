@@ -8,9 +8,3 @@
   width: 100%;
   display: flex;
 }
-
-.stats {
-  width: 100%;
-  max-width: 584px;
-  outline: 1px solid red;
-}
