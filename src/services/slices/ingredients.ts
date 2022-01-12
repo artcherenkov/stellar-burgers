@@ -22,6 +22,11 @@ interface IIngredientsState {
   dragging: string;
 }
 
+const initialConstructorState = {
+  bun: null,
+  mains: [],
+  price: 0,
+};
 const initialState: IIngredientsState = {
   // ingredients
   ingredients: [],
@@ -31,11 +36,7 @@ const initialState: IIngredientsState = {
   isDetailsPopupOpen: false,
 
   // constructor
-  constructor: {
-    bun: null,
-    mains: [],
-    price: 0,
-  },
+  constructor: initialConstructorState,
   dragging: "",
 };
 
@@ -156,6 +157,9 @@ export const ingredients = createSlice({
         ];
       }
     },
+    clearConstructor: (state) => {
+      state.constructor = initialConstructorState;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchIngredients.pending, (state) => {
@@ -229,6 +233,7 @@ export const {
   setDragging,
   swapIngredients,
   setActiveIngredient,
+  clearConstructor,
 } = actions;
 
 export default reducer;

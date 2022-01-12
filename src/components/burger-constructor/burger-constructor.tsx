@@ -14,6 +14,7 @@ import {
   selectBun,
   selectMains,
   selectPrice,
+  clearConstructor,
 } from "../../services/slices/ingredients";
 import styles from "./burger-constructor.module.css";
 import {
@@ -58,7 +59,10 @@ const BurgerConstructor = () => {
     }
 
     const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
-    dispatch(postOrderThunk(ingredientsIds)).then(() => dispatch(openOrderPopup()));
+    dispatch(postOrderThunk(ingredientsIds)).then(() => {
+      dispatch(openOrderPopup());
+      dispatch(clearConstructor());
+    });
   };
 
   const onClose = () => dispatch(closeOrderPopup());
