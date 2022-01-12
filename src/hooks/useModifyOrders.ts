@@ -4,10 +4,7 @@ import {
   TModifiedIngredient,
   updateOrders,
 } from "../services/slices/ws-orders";
-import {
-  selectIngredients,
-  fetchIngredients,
-} from "../services/slices/ingredients";
+import { selectIngredients } from "../services/slices/ingredients";
 import { useEffect, useMemo } from "react";
 import { IngredientType } from "../components/app/app.typed";
 
@@ -16,12 +13,6 @@ export const useModifyOrders = () => {
 
   const orders = useAppSelector(selectOrders);
   const ingredients = useAppSelector(selectIngredients);
-
-  useEffect(() => {
-    if (!ingredients.length) {
-      dispatch(fetchIngredients());
-    }
-  }, [ingredients]);
 
   const shouldAddPrice = useMemo(() => orders?.some((o) => o.price), [orders]);
 

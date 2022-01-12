@@ -28,6 +28,7 @@ import Layout from "../layout/layout";
 import IngredientDetails from "../ingredient-details/ingredient-details";
 
 import AdvancedFormat from "dayjs/plugin/advancedFormat";
+import { fetchIngredients } from "../../services/slices/ingredients";
 dayjs.extend(AdvancedFormat);
 
 const App = () => {
@@ -48,6 +49,10 @@ const App = () => {
   useEffect(() => {
     handleLoad();
   }, [handleLoad]);
+
+  useEffect(() => {
+    dispatch(fetchIngredients());
+  }, []);
 
   const onModalClose = (href: string) => {
     history.push(href);

@@ -6,7 +6,10 @@ import styles from "./orders-list.module.css";
 import Order from "./components/order/order";
 import cn from "classnames";
 import { useAppDispatch, useAppSelector } from "../../services/hooks";
-import { selectIsAuthenticated } from "../../services/slices/user";
+import {
+  selectIsAuthenticated,
+  selectAccessToken,
+} from "../../services/slices/user";
 import {
   WS_ORDER_ACTIONS,
   selectOrders,
@@ -24,12 +27,16 @@ const OrdersList: React.FC = () => {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const orders = useAppSelector(selectOrders);
+  const accessToken = useAppSelector(selectAccessToken);
 
   useModifyOrders();
 
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch({ type: WS_ORDER_ACTIONS.wsInitWithToken });
+      dispatch({
+        type: WS_ORDER_ACTIONS.wsInitWithCustomUrl,
+        payload: `wss://norma.nomoreparties.space/orders?token=${accessToken}`,
+      });
     }
 
     return () => {
@@ -42,11 +49,16 @@ const OrdersList: React.FC = () => {
       <div style={CONTAINER_STYLE}>
         <ProfileSidebar />
         <div className={styles.root}>
-          <ul className={cn(styles.list, "custom-scroll")}>
-            {orders?.map((o) => (
-              <Order key={o._id} data={o} />
-            ))}
-          </ul>
+          {orders && (
+            <ul className={cn(styles.list, "custom-scroll")}>
+              {orders
+                .slice()
+                .reverse()
+                .map((o) => (
+                  <Order key={o._id} data={o} />
+                ))}
+            </ul>
+          )}
         </div>
       </div>
     </Layout>

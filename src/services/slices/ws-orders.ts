@@ -3,7 +3,7 @@ import { RootState } from "../store";
 
 export const WS_ORDER_ACTIONS = {
   wsInit: "wsOrder/init",
-  wsInitWithToken: "wsOrder/initWithToken",
+  wsInitWithCustomUrl: "wsOrder/wsInitWithCustomUrl",
   wsSendMessage: "wsOrder/sendMessage",
   wsClose: "wsOrder/close",
   onOpen: "wsOrder/onOpen",

@@ -13,7 +13,7 @@ export const socketMiddleware = (
       const { type, payload } = action;
       const {
         wsInit,
-        wsInitWithToken,
+        wsInitWithCustomUrl,
         wsSendMessage,
         wsClose,
         onOpen,
@@ -25,10 +25,8 @@ export const socketMiddleware = (
       if (type === wsInit) {
         socket = new WebSocket(wsUrl);
       }
-      if (type === wsInitWithToken) {
-        let urlToConnect = wsUrl;
-        accessToken && (urlToConnect += `?token=${accessToken}`);
-        socket = new WebSocket(urlToConnect);
+      if (type === wsInitWithCustomUrl) {
+        socket = new WebSocket(payload);
       }
 
       if (socket) {

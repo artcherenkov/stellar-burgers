@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import IngredientDetails from "../../components/ingredient-details/ingredient-details";
-import { useAppDispatch, useAppSelector } from "../../services/hooks";
+import { useAppSelector } from "../../services/hooks";
 import {
   selectIngredients,
-  fetchIngredients,
   selectIngredientsLoading,
 } from "../../services/slices/ingredients";
 import Layout from "../../components/layout/layout";
@@ -16,17 +15,8 @@ const CONTAINER_STYLE = {
 };
 
 const Ingredient: React.FC = () => {
-  const dispatch = useAppDispatch();
-
   const ingredients = useAppSelector(selectIngredients);
   const ingredientsLoading = useAppSelector(selectIngredientsLoading);
-
-  useEffect(() => {
-    // загрузить ингредиенты, если их нет
-    if (!ingredients.length) {
-      dispatch(fetchIngredients());
-    }
-  }, [ingredients]);
 
   if (!ingredients.length || ingredientsLoading) {
     return (

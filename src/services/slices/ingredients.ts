@@ -180,9 +180,6 @@ export const selectActiveIngredient = (state: RootState) => {
     (i) => i._id === state.ingredients.activeIngredientId
   );
 };
-export const selectIsDetailsPopupOpen = (state: RootState) => {
-  return state.ingredients.isDetailsPopupOpen;
-};
 export const selectBun = (state: RootState) => {
   const bun = state.ingredients.ingredients.find(
     (i) => i._id === state.ingredients.constructor.bun?.id
