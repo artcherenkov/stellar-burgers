@@ -1,0 +1,77 @@
+import { createReducer, PayloadAction, createAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+
+export const WS_ORDER_ACTIONS = {
+  wsInit: "wsOrder/init",
+  wsInitWithToken: "wsOrder/initWithToken",
+  wsSendMessage: "wsOrder/sendMessage",
+  wsClose: "wsOrder/close",
+  onOpen: "wsOrder/onOpen",
+  onClose: "wsOrder/onClose",
+  onError: "wsOrder/onError",
+  onMessage: "wsOrder/onMessage",
+};
+
+export type TModifiedIngredient = {
+  id: string;
+  img: string;
+  name: string;
+  price: number;
+  qty: number;
+};
+
+export type TOrder = {
+  _id: string;
+  status: "pending" | "done";
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  number: number;
+  ingredients: string[];
+
+  price?: number;
+  modifiedIngredients?: TModifiedIngredient[];
+};
+
+interface IWsOrdersState {
+  orders: TOrder[] | undefined;
+  total: number | undefined;
+  totalToday: number | undefined;
+}
+
+const initialState: IWsOrdersState = {
+  orders: undefined,
+  total: undefined,
+  totalToday: undefined,
+};
+
+export const updateOrders = createAction<TOrder[]>("updateOrders");
+
+const counterReducer = createReducer(initialState, {
+  [updateOrders.type]: (state, action: PayloadAction<TOrder[]>) => {
+    state.orders = action.payload;
+    return state;
+  },
+  [WS_ORDER_ACTIONS.onMessage]: (
+    state,
+    action: PayloadAction<IWsOrdersState>
+  ) => {
+    state = action.payload;
+
+    return state;
+  },
+  [WS_ORDER_ACTIONS.onClose]: () => initialState,
+});
+
+export const selectOrders = (state: RootState) => {
+  return state.wsOrders.orders;
+};
+export const selectOrderById = (id: string) => (state: RootState) => {
+  return state.wsOrders.orders?.find((o) => o._id === id);
+};
+export const selectStats = (state: RootState) => {
+  const { total, totalToday } = state.wsOrders;
+  return { total, totalToday };
+};
+
+export default counterReducer;

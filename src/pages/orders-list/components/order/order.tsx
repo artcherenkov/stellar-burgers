@@ -5,39 +5,53 @@ import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components
 import IngredientImage from "../../../../components/feed-card/components/ingredient-image/ingredient-image";
 import styles from "./order.module.css";
 import * as H from "history";
+import { TOrder } from "../../../../services/slices/ws-orders";
+import { formatDate } from "../../../../components/feed-card/feed-card";
+import { OrderStatusOutput } from "../../../order-details/order-details";
 
-const Order = () => {
+interface IOrderProps {
+  data: TOrder;
+}
+
+const Order = ({ data }: IOrderProps) => {
   const location = useLocation<{ background?: H.Location }>();
+
+  const orderStatus =
+    data.status.toUpperCase() as keyof typeof OrderStatusOutput;
 
   return (
     <li className={styles.orderContainer}>
       <Link
         className={styles.order}
         to={{
-          pathname: `orders/1`,
+          pathname: `orders/${data._id}`,
           state: { background: location },
         }}
       >
         <p className={styles.header}>
-          <span className="text text_type_digits-default">#034534</span>
+          <span className="text text_type_digits-default">#{data.number}</span>
           <time className="text text_type_main-default text_color_inactive">
-            Сегодня, 13:20 i-GMT+3
+            {formatDate(data.createdAt)} i-GMT+3
           </time>
         </p>
-        <p className="text text_type_main-medium mb-2">
-          Death Star Starship Main бургер
+        <p className="text text_type_main-medium mb-2">{data.name}</p>
+        <p className="text text_type_main-default mb-6">
+          {OrderStatusOutput[orderStatus]}
         </p>
-        <p className="text text_type_main-default mb-6">Создан</p>
 
         <div className={styles.ingredientsContainer}>
           <ul className={styles.ingredientsList}>
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
+            {data.modifiedIngredients?.slice(0, 5).map((ing, i) => (
+              <IngredientImage
+                key={`${ing.id}-${data._id}-${i}`}
+                src={ing.img}
+              />
+            ))}
           </ul>
           <p className={cn(styles.priceContainer)}>
-            <span className="text text_type_digits-default mr-2">480</span>
+            <span className="text text_type_digits-default mr-2">
+              {data.price}
+            </span>
             <CurrencyIcon type="primary" />
           </p>
         </div>

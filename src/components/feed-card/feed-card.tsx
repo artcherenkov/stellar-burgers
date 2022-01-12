@@ -4,38 +4,60 @@ import { CurrencyIcon } from "@ya.praktikum/react-developer-burger-ui-components
 import IngredientImage from "./components/ingredient-image/ingredient-image";
 import styles from "./feed-card.module.css";
 import * as H from "history";
+import { TOrder } from "../../services/slices/ws-orders";
+import dayjs from "dayjs";
 
-const FeedCard = () => {
+interface IFeedCardProps {
+  data: TOrder;
+}
+
+export const formatDate = (utc: string): string => {
+  const date = dayjs(utc);
+  const isToday = dayjs().startOf("day").isSame(date, "day");
+  if (isToday) return "Сегодня, " + date.format("kk:mm");
+  const isYesterday = dayjs().subtract(1, "day").isSame(date, "day");
+  if (isYesterday) return "Вчера, " + date.format("kk:mm");
+  return date.format("DD:MM, kk:mm");
+};
+
+const FeedCard = ({ data }: IFeedCardProps) => {
   const location = useLocation<{ background?: H.Location }>();
 
   return (
     <li className={styles.cardContainer}>
       <Link
         to={{
-          pathname: `feed/1`,
+          pathname: `feed/${data._id}`,
           state: { background: location },
         }}
         className={styles.card}
       >
         <p className={cn(styles.header, "text text_type_digits-default")}>
-          #034535{" "}
+          #{data.number}{" "}
           <time className="text text_type_main-default text_color_inactive">
-            Сегодня, 16:20 i-GMT+3
+            {formatDate(data.createdAt)} i-GMT+3
           </time>
         </p>
         <h2 className={cn(styles.title, "text text_type_main-medium")}>
-          Death Star Starship Main бургер
+          {data.name}
         </h2>
         <div className={styles.priceInfo}>
-          <ul className={styles.ingredientsList}>
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-            <IngredientImage src="https://code.s3.yandex.net/react/code/bun-02-mobile.png" />
-          </ul>
+          {data.modifiedIngredients && (
+            <ul className={styles.ingredientsList}>
+              {data.modifiedIngredients
+                .slice(0, 5)
+                .reverse()
+                .map((ing, i) => (
+                  <IngredientImage
+                    key={`${ing.id}-${data._id}-${i}`}
+                    src={ing.img}
+                  />
+                ))}
+            </ul>
+          )}
           <p className={cn(styles.priceContainer)}>
             <span className={cn(styles.price, "text text_type_digits-default")}>
-              480
+              {data.price ? data.price : "–"}
             </span>
             <CurrencyIcon type="primary" />
           </p>

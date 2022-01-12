@@ -5,8 +5,8 @@
 
 .list {
   width: 100%;
-  box-sizing: border-box;
   max-width: 604px;
+  box-sizing: border-box;
   margin: 0;
   padding: 0 8px 0 0;
   list-style: none;

@@ -33,6 +33,7 @@
 }
 
 .priceContainer {
+  margin-top: 40px;
   margin-left: auto;
   display: flex;
   align-items: center;

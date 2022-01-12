@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from "react";
+import dayjs from "dayjs";
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 import {
   ForgotPassword,
@@ -25,6 +26,9 @@ import OrderDetails from "../../pages/order-details/order-details";
 import OrdersList from "../../pages/orders-list/orders-list";
 import Layout from "../layout/layout";
 import IngredientDetails from "../ingredient-details/ingredient-details";
+
+import AdvancedFormat from "dayjs/plugin/advancedFormat";
+dayjs.extend(AdvancedFormat);
 
 const App = () => {
   const history = useHistory();
