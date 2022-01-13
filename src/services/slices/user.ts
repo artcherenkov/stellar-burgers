@@ -250,6 +250,9 @@ export const selectUser = (state: RootState) => {
 export const selectCanResetPassword = (state: RootState) => {
   return state.user.canResetPassword;
 };
+export const selectAccessToken = (state: RootState) => {
+  return state.user.accessToken;
+};
 
 const { actions, reducer } = user;
 

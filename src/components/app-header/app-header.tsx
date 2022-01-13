@@ -32,13 +32,11 @@ const AppHeader = () => {
           </Link>
           <Link
             className={cn(styles.link, {
-              [styles.link_active]: pathname === "/profile/orders",
+              [styles.link_active]: pathname === "/feed",
             })}
-            to="/profile/orders"
+            to="/feed"
           >
-            <ListIcon
-              type={pathname === "/profile/orders" ? "primary" : "secondary"}
-            />
+            <ListIcon type={pathname === "/feed" ? "primary" : "secondary"} />
             <p className="text text_type_main-default ml-2">Лента заказов</p>
           </Link>
           <Link

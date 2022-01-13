@@ -14,10 +14,11 @@ import {
   selectBun,
   selectMains,
   selectPrice,
+  clearConstructor,
 } from "../../services/slices/ingredients";
 import styles from "./burger-constructor.module.css";
 import {
-  fetchOrder,
+  postOrderThunk,
   openOrderPopup,
   closeOrderPopup,
   selectIsOrderPopupOpen,
@@ -41,7 +42,7 @@ const BurgerConstructor = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const [{ isHover }, dropTarget] = useDrop({
-    accept: "ingredient-from-menu",
+    accept: "order-from-menu",
     collect: (monitor) => ({
       isHover: monitor.isOver(),
     }),
@@ -58,7 +59,10 @@ const BurgerConstructor = () => {
     }
 
     const ingredientsIds = [bun, ...mains].map((ingredient) => ingredient._id);
-    dispatch(fetchOrder(ingredientsIds)).then(() => dispatch(openOrderPopup()));
+    dispatch(postOrderThunk(ingredientsIds)).then(() => {
+      dispatch(openOrderPopup());
+      dispatch(clearConstructor());
+    });
   };
 
   const onClose = () => dispatch(closeOrderPopup());
