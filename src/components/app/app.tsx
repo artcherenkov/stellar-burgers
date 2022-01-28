@@ -153,7 +153,11 @@ const App = () => {
       )}
       {background && (
         <Route path="/ingredients/:id">
-          <Modal open={true} onClose={() => onModalClose("/")}>
+          <Modal
+            id="ingredientModal"
+            open={true}
+            onClose={() => onModalClose("/")}
+          >
             <IngredientDetails />
           </Modal>
         </Route>
