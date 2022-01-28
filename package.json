@@ -2,7 +2,7 @@
   "name": "react-burger",
   "version": "0.1.0",
   "private": true,
-  "homepage": "./stellar-burgers",
+  "homepage": "./",
   "dependencies": {
     "@reduxjs/toolkit": "1.6.1",
     "@testing-library/jest-dom": "^5.14.1",
@@ -31,7 +31,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "cypress": "cypress open cache clear",
+    "deploy-script": "npm run build && scp -r ./build/* artcherenkov@51.250.26.60:/home/artcherenkov/frontend"
   },
   "eslintConfig": {
     "extends": [
