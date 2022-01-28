@@ -21,7 +21,7 @@ interface IUserState {
   canResetPassword: boolean;
 }
 
-const initialState: IUserState = {
+export const initialState: IUserState = {
   accessToken: "",
   isAuthenticated: false,
 
