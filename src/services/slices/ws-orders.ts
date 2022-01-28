@@ -22,7 +22,7 @@ export type TModifiedIngredient = {
 
 export type TOrder = {
   _id: string;
-  status: "pending" | "done";
+  status: string | "pending" | "done";
   name: string;
   createdAt: string;
   updatedAt: string;
@@ -39,7 +39,7 @@ interface IWsOrdersState {
   totalToday: number | undefined;
 }
 
-const initialState: IWsOrdersState = {
+export const initialState: IWsOrdersState = {
   orders: undefined,
   total: undefined,
   totalToday: undefined,
@@ -47,7 +47,7 @@ const initialState: IWsOrdersState = {
 
 export const updateOrders = createAction<TOrder[]>("updateOrders");
 
-const counterReducer = createReducer(initialState, {
+const wsOrdersReducer = createReducer(initialState, {
   [updateOrders.type]: (state, action: PayloadAction<TOrder[]>) => {
     state.orders = action.payload;
     return state;
@@ -74,4 +74,4 @@ export const selectStats = (state: RootState) => {
   return { total, totalToday };
 };
 
-export default counterReducer;
+export default wsOrdersReducer;
