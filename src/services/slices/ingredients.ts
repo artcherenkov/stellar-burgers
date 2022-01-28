@@ -22,12 +22,12 @@ interface IIngredientsState {
   dragging: string;
 }
 
-const initialConstructorState = {
+export const initialConstructorState = {
   bun: null,
   mains: [],
   price: 0,
 };
-const initialState: IIngredientsState = {
+export const initialState: IIngredientsState = {
   // ingredients
   ingredients: [],
   ingredientsLoading: false,
@@ -40,7 +40,7 @@ const initialState: IIngredientsState = {
   dragging: "",
 };
 
-const countPrice = (state: IIngredientsState) => {
+export const countPrice = (state: IIngredientsState) => {
   const ingredientsToCount = [...state.constructor.mains];
   if (state.constructor.bun) {
     ingredientsToCount.push(state.constructor.bun);
@@ -132,29 +132,19 @@ export const ingredients = createSlice({
       state.dragging = action.payload;
     },
     swapIngredients: (state, action: PayloadAction<string>) => {
-      const draggingIndex = [...state.constructor.mains].findIndex(
-        (ing) => ing.id === state.dragging
-      );
-      const hoveredIndex = [...state.constructor.mains].findIndex(
-        (ing) => ing.id === action.payload
-      );
+      const { mains } = state.constructor;
 
-      const initial = [...state.constructor.mains];
+      const draggingIndex = mains.findIndex((ing) => ing.id === state.dragging);
+      const hoveredIndex = mains.findIndex((ing) => ing.id === action.payload);
 
       if (draggingIndex > hoveredIndex) {
-        state.constructor.mains = [
-          ...initial.slice(0, draggingIndex - 1),
-          initial[draggingIndex],
-          initial[hoveredIndex],
-          ...initial.slice(draggingIndex + 1),
-        ];
+        const temp = mains[hoveredIndex];
+        mains[hoveredIndex] = mains[draggingIndex];
+        mains[draggingIndex] = temp;
       } else if (draggingIndex < hoveredIndex) {
-        state.constructor.mains = [
-          ...initial.slice(0, hoveredIndex - 1),
-          initial[hoveredIndex],
-          initial[draggingIndex],
-          ...initial.slice(hoveredIndex + 1),
-        ];
+        const temp = mains[draggingIndex];
+        mains[draggingIndex] = mains[hoveredIndex];
+        mains[hoveredIndex] = temp;
       }
     },
     clearConstructor: (state) => {
