@@ -21,7 +21,7 @@ interface IUserState {
   canResetPassword: boolean;
 }
 
-const initialState: IUserState = {
+export const initialState: IUserState = {
   accessToken: "",
   isAuthenticated: false,
 
@@ -49,7 +49,6 @@ export const refreshToken = createAsyncThunk<TRefreshTokenOutput>(
 
     return api.refreshToken(refreshToken).then((data) => {
       localStorage.setItem("refresh-token", data.refreshToken);
-
       return { ...data, accessToken: data.accessToken.split("Bearer ")[1] };
     });
   }

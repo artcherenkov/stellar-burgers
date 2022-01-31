@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   postOrder,
   TPostOrderOutput,
@@ -25,7 +25,7 @@ interface IOrderState {
   ordersLoading: boolean;
 }
 
-const initialState: IOrderState = {
+export const initialState: IOrderState = {
   orderDetails: {
     name: "",
     order: {
@@ -58,6 +58,7 @@ export const fetchOrdersThunk = createAsyncThunk<
   const orders = await fetchOrders(token);
   thunkAPI.dispatch(updateOrders(orders.orders));
 });
+
 export const order = createSlice({
   name: "order",
   initialState,
@@ -67,10 +68,7 @@ export const order = createSlice({
     },
     closeOrderPopup: (state) => {
       state.isOrderPopupOpen = false;
-    },
-    setActiveOrder: (state, action: PayloadAction<TOrder>) => {
-      state.activeOrder = action.payload;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(postOrderThunk.pending, (state) => {
@@ -99,6 +97,6 @@ export const selectIsOrderPopupOpen = (state: RootState) => {
 
 const { actions, reducer } = order;
 
-export const { openOrderPopup, closeOrderPopup, setActiveOrder } = actions;
+export const { openOrderPopup, closeOrderPopup } = actions;
 
 export default reducer;
